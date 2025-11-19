@@ -1,0 +1,19 @@
+{
+  "name": "enerpay-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Enerpay on Celo",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:celoSepolia": "hardhat run scripts/deploy.js --network celoSepolia",
+    "deploy:alfajores": "hardhat run scripts/deploy.js --network alfajores",
+    "deploy:celo": "hardhat run scripts/deploy.js --network celo"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "chai": "^4.5.0",
+    "dotenv": "^17.2.3",
+    "hardhat": "^2.22.0"
+  }
+}

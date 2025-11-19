@@ -1,0 +1,30 @@
+{
+  "name": "Enerpay - Financial Inclusion for LATAM",
+  "short_name": "Enerpay",
+  "description": "Mobile payments, remittances, and microfinance on Celo blockchain",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FBFFFE",
+  "theme_color": "#35D07F",
+  "orientation": "portrait-primary",
+  "icons": [],
+  "categories": ["finance", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Send Payment",
+      "short_name": "Send",
+      "description": "Send cUSD payment",
+      "url": "/send",
+      "icons": []
+    },
+    {
+      "name": "Receive Payment",
+      "short_name": "Receive",
+      "description": "Receive cUSD payment",
+      "url": "/receive",
+      "icons": []
+    }
+  ]
+}
+
