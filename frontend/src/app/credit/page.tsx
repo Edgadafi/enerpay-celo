@@ -7,6 +7,13 @@ import { useAccount } from "wagmi";
 import { TrendingUp, DollarSign, Clock, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Header } from "@/components/Header";
+import { 
+  useMicrofinance, 
+  useReputationScore, 
+  useRequestLoan,
+  useMicrofinanceParams 
+} from "@/hooks/useMicrofinance";
+import { useCelo } from "@/hooks/useCelo";
 
 interface CreditRequest {
   amount: string;
@@ -16,21 +23,29 @@ interface CreditRequest {
 
 export default function CreditPage() {
   const { isConnected, address } = useAccount();
+  const { isCeloSepolia, switchToCeloSepolia } = useCelo();
+  const { isCeloSepolia: isMicrofinanceReady, contractAddress } = useMicrofinance();
+  const { reputation, isLoading: reputationLoading } = useReputationScore();
+  const { minLoanAmount, maxLoanAmount, minReputationScore, isLoading: paramsLoading } = useMicrofinanceParams();
+  const { requestLoan, hash, isPending, isConfirming, isSuccess, error: txError } = useRequestLoan();
+  
   const [selectedOption, setSelectedOption] = useState<"request" | "history" | null>(null);
   const [formData, setFormData] = useState<CreditRequest>({
     amount: "",
     purpose: "",
     repaymentPeriod: "3",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
 
   const handleSubmitRequest = async () => {
     setError("");
-    setSuccess(false);
 
     // Validation
+    if (!isCeloSepolia) {
+      setError("Please switch to Celo Sepolia network");
+      return;
+    }
+
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
       setError("Please enter a valid credit amount");
       return;
@@ -41,48 +56,47 @@ export default function CreditPage() {
       return;
     }
 
-    if (parseFloat(formData.amount) < 10) {
-      setError("Minimum credit amount is 10 cUSD");
+    const amount = parseFloat(formData.amount);
+    const minAmount = parseFloat(minLoanAmount);
+    const maxAmount = parseFloat(maxLoanAmount);
+
+    if (amount < minAmount) {
+      setError(`Minimum credit amount is ${minAmount} cUSD`);
       return;
     }
 
-    if (parseFloat(formData.amount) > 10000) {
-      setError("Maximum credit amount is 10,000 cUSD");
+    if (amount > maxAmount) {
+      setError(`Maximum credit amount is ${maxAmount} cUSD`);
       return;
     }
 
-    setIsSubmitting(true);
+    if (reputation < minReputationScore) {
+      setError(`Insufficient reputation score. Minimum required: ${minReputationScore}, Your score: ${reputation}`);
+      return;
+    }
 
     try {
-      // TODO: Integrate with MicrofinancePool contract when available
-      // For now, simulate the request
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // In production, this would:
-      // 1. Check user's credit score from CreditScore contract
-      // 2. Validate eligibility
-      // 3. Call MicrofinancePool.requestLoan()
-      // 4. Wait for transaction confirmation
-      // 5. Show transaction hash
-
-      setSuccess(true);
-      
-      // Reset form after 3 seconds
-      setTimeout(() => {
-        setFormData({ amount: "", purpose: "", repaymentPeriod: "3" });
-        setSuccess(false);
-        setSelectedOption(null);
-      }, 3000);
+      await requestLoan(
+        formData.amount,
+        parseInt(formData.repaymentPeriod),
+        formData.purpose
+      );
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
           : "Failed to submit credit request. Please try again."
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
+
+  // Reset form on success
+  if (isSuccess) {
+    setTimeout(() => {
+      setFormData({ amount: "", purpose: "", repaymentPeriod: "3" });
+      setSelectedOption(null);
+    }, 3000);
+  }
 
   if (!isConnected) {
     return (
@@ -93,6 +107,25 @@ export default function CreditPage() {
             Please connect your wallet to access credit services
           </p>
           <ConnectButton />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCeloSepolia) {
+    return (
+      <div className="min-h-screen p-4 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-6 text-center">
+          <h2 className="text-2xl font-bold mb-4">Switch to Celo Sepolia</h2>
+          <p className="text-gray-600 mb-6">
+            Please switch to Celo Sepolia Testnet to use credit services
+          </p>
+          <button
+            onClick={switchToCeloSepolia}
+            className="w-full bg-celo-green text-white py-3 px-6 rounded-xl font-semibold hover:bg-primary-600 transition-colors"
+          >
+            Switch Network
+          </button>
         </div>
       </div>
     );
@@ -218,25 +251,50 @@ export default function CreditPage() {
                   </select>
                 </div>
 
+                {/* Reputation Score */}
+                {!reputationLoading && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-blue-900">Your Reputation Score:</span>
+                      <span className="text-lg font-bold text-blue-600">{reputation}/1000</span>
+                    </div>
+                    {reputation < minReputationScore && (
+                      <p className="text-xs text-blue-700 mt-2">
+                        Minimum required: {minReputationScore}. Build your reputation by making payments and remittances.
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {/* Error Message */}
-                {error && (
+                {(error || txError) && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-800">{error}</p>
+                    <p className="text-sm text-red-800">{error || txError?.message}</p>
                   </div>
                 )}
 
                 {/* Success Message */}
-                {success && (
+                {isSuccess && (
                   <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-green-800 mb-1">
                         Credit Request Submitted!
                       </p>
-                      <p className="text-xs text-green-700">
+                      <p className="text-xs text-green-700 mb-2">
                         Your request is being reviewed. You&apos;ll be notified once it&apos;s processed.
                       </p>
+                      {hash && (
+                        <a
+                          href={`https://explorer.celo.org/sepolia/tx/${hash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs underline text-green-700"
+                        >
+                          View transaction
+                        </a>
+                      )}
                     </div>
                   </div>
                 )}
@@ -249,15 +307,15 @@ export default function CreditPage() {
 
                 <button
                   onClick={handleSubmitRequest}
-                  disabled={isSubmitting || success}
+                  disabled={isPending || isConfirming || isSuccess || reputationLoading || paramsLoading}
                   className="w-full bg-celo-green text-white py-3 px-6 rounded-xl font-semibold hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {isSubmitting ? (
+                  {isPending || isConfirming ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Submitting...</span>
+                      <span>{isPending ? "Confirming..." : "Processing..."}</span>
                     </>
-                  ) : success ? (
+                  ) : isSuccess ? (
                     <>
                       <CheckCircle2 className="w-5 h-5" />
                       <span>Request Submitted</span>

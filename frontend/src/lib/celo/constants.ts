@@ -66,6 +66,10 @@ export const CONTRACTS = {
   ENERPAY_REMITTANCE_SEPOLIA:
     process.env.NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS ||
     "0x733177De022870Eb7Cfd0B72fAC63F53a1F96f48",
+  // MicrofinancePool deployed on Celo Sepolia
+  MICROFINANCE_POOL_SEPOLIA:
+    process.env.NEXT_PUBLIC_MICROFINANCE_CONTRACT_ADDRESS ||
+    "0x79Cdf63629bB1a9c5199416Fcc72Ab9FCD8bBea2",
 } as const;
 
 // ERC20 ABI for token interactions
