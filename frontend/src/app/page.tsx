@@ -37,9 +37,13 @@ export default function Home() {
     <main className="min-h-screen pb-20">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
-          <Logo size="md" showText={true} />
-          <ConnectButton showBalance={false} />
+        <div className="max-w-md mx-auto px-4 py-5 flex items-center justify-between gap-4 min-h-[64px]">
+          <div className="flex-1 min-w-0">
+            <Logo size="md" showText={true} />
+          </div>
+          <div className="flex-shrink-0">
+            <ConnectButton showBalance={false} />
+          </div>
         </div>
       </header>
 

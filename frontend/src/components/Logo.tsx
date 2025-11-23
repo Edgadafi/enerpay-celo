@@ -24,7 +24,7 @@ export function Logo({ size = "md", showText = true, className }: LogoProps) {
   };
 
   return (
-    <div className={cn("flex items-center gap-3", className)}>
+    <div className={cn("flex items-center gap-4 flex-shrink-0", className)}>
       {/* Logo Circle with Gradient */}
       <div
         className={cn(
