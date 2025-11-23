@@ -34,7 +34,7 @@ export function Header({
           <h1 className="text-xl font-bold flex-1 min-w-0">{title}</h1>
         ) : (
           <div className="flex-1 min-w-0">
-            <Logo size="md" showText={true} />
+            <Logo size="md" variant="full" animated={true} />
           </div>
         )}
 

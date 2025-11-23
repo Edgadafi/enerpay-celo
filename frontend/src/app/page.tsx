@@ -39,7 +39,7 @@ export default function Home() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-md mx-auto px-4 py-5 flex items-center justify-between gap-4 min-h-[64px]">
           <div className="flex-1 min-w-0">
-            <Logo size="md" showText={true} />
+            <Logo size="md" variant="full" animated={true} />
           </div>
           <div className="flex-shrink-0">
             <ConnectButton showBalance={false} />
@@ -74,7 +74,7 @@ export default function Home() {
         ) : (
           <div className="text-center py-12">
             <div className="flex justify-center mb-6">
-              <Logo size="xl" showText={true} />
+              <Logo size="xl" variant="full" animated={true} showGlow={true} />
             </div>
             <h2 className="text-2xl font-bold mb-4 text-celo-dark">
               Welcome to EnerPay
