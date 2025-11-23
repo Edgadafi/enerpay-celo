@@ -201,10 +201,9 @@ export default function CreditPage() {
                     onChange={(e) => {
                       setFormData({ ...formData, amount: e.target.value });
                       setError("");
-                      setSuccess(false);
                     }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none"
-                    disabled={isSubmitting}
+                    disabled={isPending || isConfirming}
                   />
                 </div>
 
@@ -217,10 +216,9 @@ export default function CreditPage() {
                     onChange={(e) => {
                       setFormData({ ...formData, purpose: e.target.value });
                       setError("");
-                      setSuccess(false);
                     }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none"
-                    disabled={isSubmitting}
+                    disabled={isPending || isConfirming}
                   >
                     <option value="">Select purpose</option>
                     <option value="business">Business</option>
@@ -239,10 +237,9 @@ export default function CreditPage() {
                     onChange={(e) => {
                       setFormData({ ...formData, repaymentPeriod: e.target.value });
                       setError("");
-                      setSuccess(false);
                     }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none"
-                    disabled={isSubmitting}
+                    disabled={isPending || isConfirming}
                   >
                     <option value="3">3 months</option>
                     <option value="6">6 months</option>
@@ -330,10 +327,9 @@ export default function CreditPage() {
                     setSelectedOption(null);
                     setFormData({ amount: "", purpose: "", repaymentPeriod: "3" });
                     setError("");
-                    setSuccess(false);
                   }}
                   className="w-full text-gray-600 py-2 text-sm"
-                  disabled={isSubmitting}
+                  disabled={isPending || isConfirming}
                 >
                   Cancel
                 </button>
