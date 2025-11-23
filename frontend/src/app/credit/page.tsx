@@ -235,7 +235,7 @@ export default function CreditPage() {
                         Credit Request Submitted!
                       </p>
                       <p className="text-xs text-green-700">
-                        Your request is being reviewed. You'll be notified once it's processed.
+                        Your request is being reviewed. You&apos;ll be notified once it&apos;s processed.
                       </p>
                     </div>
                   </div>
