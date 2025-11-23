@@ -4,10 +4,10 @@ export const dynamic = "force-dynamic";
 
 import { useAccount } from "wagmi";
 import { QRCodeSVG } from "qrcode.react";
-import { ArrowLeft, Copy, Check } from "lucide-react";
-import Link from "next/link";
+import { Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Header } from "@/components/Header";
 import { truncateAddress } from "@/lib/celo/utils";
 
 export default function ReceivePage() {
@@ -39,17 +39,7 @@ export default function ReceivePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-4">
-          <Link
-            href="/"
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Link>
-          <h1 className="text-xl font-bold">Receive Payment</h1>
-        </div>
-      </header>
+      <Header title="Receive Payment" showBack={true} />
 
       {/* Content */}
       <div className="max-w-md mx-auto px-4 py-6">

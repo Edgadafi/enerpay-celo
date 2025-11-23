@@ -6,9 +6,9 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useRemittance, useSendRemittance, useCalculateFee } from "@/hooks/useRemittance";
 import { isValidAddress } from "@/lib/celo/utils";
-import { ArrowLeft, Send, Loader2, Calculator } from "lucide-react";
-import Link from "next/link";
+import { Send, Loader2, Calculator } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Header } from "@/components/Header";
 
 const DESTINATION_TYPES = [
   { value: "wallet", label: "Wallet (Instant)" },
@@ -107,17 +107,7 @@ export default function RemittancePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-4">
-          <Link
-            href="/"
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Link>
-          <h1 className="text-xl font-bold">Send Remittance</h1>
-        </div>
-      </header>
+      <Header title="Send Remittance" showBack={true} />
 
       {/* Form */}
       <div className="max-w-md mx-auto px-4 py-6">

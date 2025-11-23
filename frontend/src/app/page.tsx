@@ -8,6 +8,7 @@ import { WalletCard } from "@/components/wallet/WalletCard";
 import { SendPaymentButton } from "@/components/payment/SendPaymentButton";
 import { ReceivePaymentButton } from "@/components/payment/ReceivePaymentButton";
 import { QuickActions } from "@/components/wallet/QuickActions";
+import { Logo } from "@/components/Logo";
 
 export default function Home() {
   const { isConnected, isCeloSepolia, switchToCeloSepolia, cusdBalanceFormatted } = useCelo();
@@ -37,7 +38,7 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-celo-dark">Enerpay</h1>
+          <Logo size="md" showText={true} />
           <ConnectButton showBalance={false} />
         </div>
       </header>
@@ -68,8 +69,11 @@ export default function Home() {
           </>
         ) : (
           <div className="text-center py-12">
+            <div className="flex justify-center mb-6">
+              <Logo size="xl" showText={true} />
+            </div>
             <h2 className="text-2xl font-bold mb-4 text-celo-dark">
-              Welcome to Enerpay
+              Welcome to EnerPay
             </h2>
             <p className="text-gray-600 mb-8">
               Connect your wallet to start sending payments and remittances on

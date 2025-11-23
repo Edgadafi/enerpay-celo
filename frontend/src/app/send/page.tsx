@@ -7,9 +7,9 @@ import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagm
 import { parseCUSD, isValidAddress } from "@/lib/celo/utils";
 import { TOKENS, CELO_MAINNET_CHAIN_ID } from "@/lib/celo/constants";
 import { erc20Abi } from "viem";
-import { ArrowLeft, Send, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { Send, Loader2 } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Header } from "@/components/Header";
 
 export default function SendPage() {
   const { address, isConnected } = useAccount();
@@ -81,17 +81,7 @@ export default function SendPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-4">
-          <Link
-            href="/"
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Link>
-          <h1 className="text-xl font-bold">Send Payment</h1>
-        </div>
-      </header>
+      <Header title="Send Payment" showBack={true} />
 
       {/* Form */}
       <div className="max-w-md mx-auto px-4 py-6">
