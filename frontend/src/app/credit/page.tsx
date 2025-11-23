@@ -4,13 +4,85 @@ export const dynamic = "force-dynamic";
 
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { TrendingUp, DollarSign, Clock, CheckCircle2 } from "lucide-react";
+import { TrendingUp, DollarSign, Clock, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Header } from "@/components/Header";
 
+interface CreditRequest {
+  amount: string;
+  purpose: string;
+  repaymentPeriod: string;
+}
+
 export default function CreditPage() {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const [selectedOption, setSelectedOption] = useState<"request" | "history" | null>(null);
+  const [formData, setFormData] = useState<CreditRequest>({
+    amount: "",
+    purpose: "",
+    repaymentPeriod: "3",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmitRequest = async () => {
+    setError("");
+    setSuccess(false);
+
+    // Validation
+    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      setError("Please enter a valid credit amount");
+      return;
+    }
+
+    if (!formData.purpose) {
+      setError("Please select a purpose for the credit");
+      return;
+    }
+
+    if (parseFloat(formData.amount) < 10) {
+      setError("Minimum credit amount is 10 cUSD");
+      return;
+    }
+
+    if (parseFloat(formData.amount) > 10000) {
+      setError("Maximum credit amount is 10,000 cUSD");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // TODO: Integrate with MicrofinancePool contract when available
+      // For now, simulate the request
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // In production, this would:
+      // 1. Check user's credit score from CreditScore contract
+      // 2. Validate eligibility
+      // 3. Call MicrofinancePool.requestLoan()
+      // 4. Wait for transaction confirmation
+      // 5. Show transaction hash
+
+      setSuccess(true);
+      
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({ amount: "", purpose: "", repaymentPeriod: "3" });
+        setSuccess(false);
+        setSelectedOption(null);
+      }, 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to submit credit request. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!isConnected) {
     return (
@@ -92,7 +164,14 @@ export default function CreditPage() {
                     step="0.01"
                     min="0"
                     placeholder="0.00"
+                    value={formData.amount}
+                    onChange={(e) => {
+                      setFormData({ ...formData, amount: e.target.value });
+                      setError("");
+                      setSuccess(false);
+                    }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none"
+                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -100,7 +179,16 @@ export default function CreditPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Purpose
                   </label>
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none">
+                  <select
+                    value={formData.purpose}
+                    onChange={(e) => {
+                      setFormData({ ...formData, purpose: e.target.value });
+                      setError("");
+                      setSuccess(false);
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none"
+                    disabled={isSubmitting}
+                  >
                     <option value="">Select purpose</option>
                     <option value="business">Business</option>
                     <option value="personal">Personal</option>
@@ -113,7 +201,16 @@ export default function CreditPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Repayment Period (months)
                   </label>
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none">
+                  <select
+                    value={formData.repaymentPeriod}
+                    onChange={(e) => {
+                      setFormData({ ...formData, repaymentPeriod: e.target.value });
+                      setError("");
+                      setSuccess(false);
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none"
+                    disabled={isSubmitting}
+                  >
                     <option value="3">3 months</option>
                     <option value="6">6 months</option>
                     <option value="12">12 months</option>
@@ -121,19 +218,64 @@ export default function CreditPage() {
                   </select>
                 </div>
 
+                {/* Error Message */}
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-red-800">{error}</p>
+                  </div>
+                )}
+
+                {/* Success Message */}
+                {success && (
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-green-800 mb-1">
+                        Credit Request Submitted!
+                      </p>
+                      <p className="text-xs text-green-700">
+                        Your request is being reviewed. You'll be notified once it's processed.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
                   <p className="text-sm text-yellow-800">
                     <strong>Note:</strong> Credit approval is subject to credit score and reputation system evaluation.
                   </p>
                 </div>
 
-                <button className="w-full bg-celo-green text-white py-3 px-6 rounded-xl font-semibold hover:bg-primary-600 transition-colors">
-                  Submit Request
+                <button
+                  onClick={handleSubmitRequest}
+                  disabled={isSubmitting || success}
+                  className="w-full bg-celo-green text-white py-3 px-6 rounded-xl font-semibold hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : success ? (
+                    <>
+                      <CheckCircle2 className="w-5 h-5" />
+                      <span>Request Submitted</span>
+                    </>
+                  ) : (
+                    "Submit Request"
+                  )}
                 </button>
 
                 <button
-                  onClick={() => setSelectedOption(null)}
+                  onClick={() => {
+                    setSelectedOption(null);
+                    setFormData({ amount: "", purpose: "", repaymentPeriod: "3" });
+                    setError("");
+                    setSuccess(false);
+                  }}
                   className="w-full text-gray-600 py-2 text-sm"
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </button>
