@@ -25,15 +25,24 @@ Ninguna variable es estrictamente requerida, pero se recomienda configurar:
 | `NEXT_PUBLIC_CELO_RPC_URL` | URL del RPC de Celo (opcional, usa default si no se define) | `https://forno.celo.org` | - |
 | `NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS` | Dirección del contrato de remesas (opcional, usa default) | `0x733177De022870Eb7Cfd0B72fAC63F53a1F96f48` | Contrato desplegado |
 
-## 📦 Método 1: Despliegue desde Vercel Dashboard (Recomendado)
+## ✅ Repositorio Ya Conectado
 
-### Paso 1: Conectar Repositorio
+**¡Buenas noticias!** El repositorio ya está conectado con Vercel para despliegues automáticos.
 
-1. Ve a [vercel.com/new](https://vercel.com/new)
-2. Conecta tu repositorio de Git (GitHub, GitLab o Bitbucket)
-3. Selecciona el repositorio `enerpay`
+- **Repositorio**: `https://github.com/Edgadafi/enerpay-celo`
+- **Proyecto Vercel**: `enerpay`
+- **Estado**: ✅ Conectado
 
-### Paso 2: Configurar Proyecto
+Cada push a la rama `main` despliega automáticamente a producción. Ver [DEPLOY_AUTOMATIC.md](./DEPLOY_AUTOMATIC.md) para más detalles.
+
+## 📦 Método 1: Despliegue desde Vercel Dashboard (Ya Configurado)
+
+### Paso 1: Verificar Conexión (Ya Hecho)
+
+El repositorio ya está conectado. Puedes verificar en:
+- Vercel Dashboard → Settings → Git
+
+### Paso 2: Configurar Proyecto (Ya Configurado)
 
 1. **Root Directory**: Selecciona `frontend` (o deja vacío si el proyecto está en la raíz)
 2. **Framework Preset**: Debería detectar automáticamente "Next.js"
@@ -163,9 +172,13 @@ En la consola del navegador, verifica que no haya errores de:
 
 ## 🔄 Actualizaciones Automáticas
 
+✅ **Ya configurado**: El repositorio está conectado y los despliegues automáticos están activos.
+
 Vercel despliega automáticamente cuando haces push a:
-- **Producción**: Rama `main` o `master`
-- **Preview**: Cualquier otra rama o pull request
+- **Producción**: Rama `main` → `https://enerpay.vercel.app`
+- **Preview**: Cualquier otra rama o pull request → URL única por rama/PR
+
+Para más detalles sobre despliegues automáticos, ver [DEPLOY_AUTOMATIC.md](./DEPLOY_AUTOMATIC.md).
 
 ## 📊 Monitoreo
 
