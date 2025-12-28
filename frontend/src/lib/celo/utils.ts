@@ -95,3 +95,33 @@ export function formatCurrency(
   }).format(numAmount);
 }
 
+/**
+ * Validate phone number in E.164 format
+ * E.164 format: +[country code][number] (e.g., +521234567890)
+ * - Must start with +
+ * - Country code: 1-3 digits
+ * - Number: 4-15 digits (total length including country code: max 15 digits)
+ */
+export function isValidPhoneNumber(phone: string): boolean {
+  if (!phone) return false;
+  // E.164 format: + followed by 1-15 digits
+  // Total length: 1 (for +) + 1-15 digits = 2-16 characters
+  const e164Regex = /^\+[1-9]\d{1,14}$/;
+  return e164Regex.test(phone);
+}
+
+/**
+ * Format phone number to E.164 format (removes spaces, dashes, parentheses)
+ * Note: This only cleans the format, doesn't add country code
+ */
+export function formatPhoneToE164(phone: string): string {
+  if (!phone) return "";
+  // Remove all non-digit characters except +
+  let cleaned = phone.replace(/[^\d+]/g, "");
+  // Ensure it starts with +
+  if (!cleaned.startsWith("+")) {
+    cleaned = "+" + cleaned;
+  }
+  return cleaned;
+}
+

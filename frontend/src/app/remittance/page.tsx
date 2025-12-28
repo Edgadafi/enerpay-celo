@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useRemittance, useSendRemittance, useCalculateFee } from "@/hooks/useRemittance";
-import { isValidAddress } from "@/lib/celo/utils";
+import { isValidAddress, isValidPhoneNumber, formatPhoneToE164 } from "@/lib/celo/utils";
 import { Send, Loader2, Calculator } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Header } from "@/components/Header";
@@ -21,7 +21,7 @@ export default function RemittancePage() {
   const { isCeloSepolia, contractAddress } = useRemittance();
   const [beneficiary, setBeneficiary] = useState("");
   const [amount, setAmount] = useState("");
-  const [destinationType, setDestinationType] = useState("wallet");
+  const [destinationType, setDestinationType] = useState("mobile"); // Default to mobile for better UX
   const [destinationId, setDestinationId] = useState("");
   const [error, setError] = useState("");
 
@@ -32,6 +32,13 @@ export default function RemittancePage() {
 
   const handleSend = async () => {
     setError("");
+    
+    console.log("📤 handleSend called with:", {
+      destinationType,
+      beneficiary,
+      destinationId,
+      amount,
+    });
 
     // Validation
     if (!isConnected) {
@@ -44,9 +51,15 @@ export default function RemittancePage() {
       return;
     }
 
-    if (!beneficiary || !isValidAddress(beneficiary)) {
-      setError("Please enter a valid beneficiary address");
-      return;
+    // For mobile and bank, beneficiary address is optional (will use contract address as escrow)
+    // For wallet type, beneficiary address is required
+    if (destinationType === "wallet") {
+      if (!beneficiary || !isValidAddress(beneficiary)) {
+        setError("Please enter a valid beneficiary address");
+        return;
+      }
+    } else {
+      console.log("✅ Skipping beneficiary validation for", destinationType);
     }
 
     if (!amount || parseFloat(amount) <= 0) {
@@ -67,8 +80,26 @@ export default function RemittancePage() {
       return;
     }
 
+    // Validate phone number format for mobile type
+    if (destinationType === "mobile") {
+      if (!isValidPhoneNumber(finalDestinationId)) {
+        setError(
+          "Invalid phone number format. Please use E.164 format: +[country code][number]\n" +
+          "Examples: +521234567890 (Mexico), +571234567890 (Colombia), +541123456789 (Argentina)"
+        );
+        return;
+      }
+    }
+
     try {
-      await sendRemittance(beneficiary, amount, destinationType, finalDestinationId);
+      // For mobile/bank, use contract address as beneficiary (funds stay in contract as escrow)
+      // In production, this would be resolved via an identity service
+      const finalBeneficiary = 
+        destinationType === "wallet" 
+          ? beneficiary 
+          : contractAddress; // Use contract as escrow for mobile/bank
+      
+      await sendRemittance(finalBeneficiary, amount, destinationType, finalDestinationId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Transaction failed");
     }
@@ -112,19 +143,38 @@ export default function RemittancePage() {
       {/* Form */}
       <div className="max-w-md mx-auto px-4 py-6">
         <div className="bg-white rounded-2xl p-6 shadow-sm space-y-6">
-          {/* Beneficiary */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Beneficiary Address
-            </label>
-            <input
-              type="text"
-              value={beneficiary}
-              onChange={(e) => setBeneficiary(e.target.value)}
-              placeholder="0x..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none"
-            />
-          </div>
+          {/* Beneficiary (only required for wallet type) */}
+          {destinationType === "wallet" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Beneficiary Address <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={beneficiary}
+                onChange={(e) => setBeneficiary(e.target.value)}
+                placeholder="0x..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none"
+              />
+            </div>
+          )}
+          
+          {/* Info for mobile/bank */}
+          {(destinationType === "mobile" || destinationType === "bank") && (
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <p className="text-sm text-blue-800">
+                <strong>Note:</strong> For {destinationType === "mobile" ? "Mobile Money" : "Bank"} transfers, 
+                you only need to provide the {destinationType === "mobile" ? "phone number" : "account number"}. 
+                The funds will be held in escrow until the remittance is processed.
+              </p>
+              {destinationType === "mobile" && (
+                <p className="text-xs text-blue-600 mt-2">
+                  In production, the phone number would be automatically resolved to a wallet address 
+                  using Celo&apos;s identity protocol or a similar service.
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Amount */}
           <div>
@@ -176,9 +226,22 @@ export default function RemittancePage() {
             <select
               value={destinationType}
               onChange={(e) => {
-                setDestinationType(e.target.value);
-                if (e.target.value === "wallet") {
-                  setDestinationId(beneficiary);
+                const newType = e.target.value;
+                console.log("🔄 Changing destination type to:", newType);
+                setDestinationType(newType);
+                // Clear beneficiary when switching to mobile/bank
+                if (newType !== "wallet") {
+                  console.log("🧹 Clearing beneficiary field (not wallet type)");
+                  setBeneficiary("");
+                } else {
+                  // When switching to wallet, use destinationId as beneficiary if available
+                  if (destinationId && isValidAddress(destinationId)) {
+                    setBeneficiary(destinationId);
+                  }
+                }
+                // Clear destinationId when switching to wallet
+                if (newType === "wallet") {
+                  setDestinationId(beneficiary || "");
                 }
               }}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none"
@@ -207,14 +270,31 @@ export default function RemittancePage() {
               <input
                 type="text"
                 value={destinationId}
-                onChange={(e) => setDestinationId(e.target.value)}
+                onChange={(e) => {
+                  // Auto-format phone numbers to E.164
+                  if (destinationType === "mobile") {
+                    const formatted = formatPhoneToE164(e.target.value);
+                    setDestinationId(formatted);
+                  } else {
+                    setDestinationId(e.target.value);
+                  }
+                }}
                 placeholder={
                   destinationType === "bank"
                     ? "Account number"
-                    : "Phone number"
+                    : "+521234567890"
                 }
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-celo-green focus:border-transparent outline-none"
               />
+              {destinationType === "mobile" && (
+                <div className="mt-2 text-xs text-gray-500 space-y-1">
+                  <p className="font-medium">Format: E.164 (International)</p>
+                  <p>Must start with + followed by country code and number</p>
+                  <p className="text-gray-400">
+                    Examples: +521234567890 (MX), +571234567890 (CO), +541123456789 (AR)
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
