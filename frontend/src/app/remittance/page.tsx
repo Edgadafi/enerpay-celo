@@ -431,11 +431,39 @@ export default function RemittancePage() {
         throw new Error(`Please switch to Celo Sepolia. Current chain: ${parseInt(currentChain as string, 16)}`);
       }
       
+      // Check contract's cUSD balance before simulating
+      if (publicClient) {
+        try {
+          const contractBalance = await publicClient.readContract({
+            address: TOKENS.CUSD,
+            abi: erc20Abi,
+            functionName: "balanceOf",
+            args: [contractAddress],
+          });
+          console.log("📊 Contract cUSD balance:", formatUnits(contractBalance as bigint, 18), "cUSD");
+          
+          // Calculate fee
+          const feeWei = parseCUSD(feeFormatted || "0");
+          console.log("💰 Fee to transfer to treasury:", formatUnits(feeWei, 18), "cUSD");
+          
+          // Check if contract will have enough balance after receiving funds
+          const balanceAfterReceive = contractBalance + totalAmountWei;
+          console.log("📊 Contract balance after receiving funds:", formatUnits(balanceAfterReceive as bigint, 18), "cUSD");
+          
+          if (balanceAfterReceive < feeWei) {
+            throw new Error(`Contract will not have enough balance to transfer fee. Balance after receive: ${formatUnits(balanceAfterReceive as bigint, 18)} cUSD, Fee needed: ${formatUnits(feeWei, 18)} cUSD`);
+          }
+        } catch (balanceErr: any) {
+          console.error("❌ Error checking contract balance:", balanceErr);
+          // Continue anyway, simulation will catch the error
+        }
+      }
+      
       // Try to simulate the transaction first to get revert reason
       if (publicClient) {
         try {
           console.log("🔍 Simulating transaction to check for errors...");
-          await publicClient.simulateContract({
+          const result = await publicClient.simulateContract({
             address: contractAddress,
             abi: ENERPAY_REMITTANCE_ABI,
             functionName: "sendRemittance",
@@ -443,10 +471,22 @@ export default function RemittancePage() {
             account: address as `0x${string}`,
           });
           console.log("✅ Transaction simulation successful - no errors detected");
+          console.log("📊 Simulation result:", result);
         } catch (simErr: any) {
           console.error("❌ Transaction simulation failed:", simErr);
-          const errorMessage = simErr?.shortMessage || simErr?.message || "Transaction would fail";
-          setError(`Transaction would fail: ${errorMessage}. Please check your balance and try again.`);
+          console.error("❌ Full error details:", JSON.stringify(simErr, null, 2));
+          
+          // Try to extract more specific error information
+          let errorMessage = "Transaction would fail";
+          if (simErr?.cause?.cause?.data) {
+            errorMessage = `Transaction would fail: ${simErr.cause.cause.data}`;
+          } else if (simErr?.shortMessage) {
+            errorMessage = simErr.shortMessage;
+          } else if (simErr?.message) {
+            errorMessage = simErr.message;
+          }
+          
+          setError(`${errorMessage}. Please check your balance and allowance.`);
           setIsCheckingAllowance(false);
           return;
         }
