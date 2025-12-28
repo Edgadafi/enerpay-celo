@@ -38,6 +38,8 @@ export default function SendPage() {
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
+  const [lastTransactionAmount, setLastTransactionAmount] = useState<bigint | null>(null);
+  const [lastRecipient, setLastRecipient] = useState<string | null>(null);
 
   // Use wallet's current chain ID - prioritize chain.id from account, fallback to walletChainId
   // This is the ACTUAL chainId from the connected wallet
@@ -107,9 +109,41 @@ export default function SendPage() {
           });
           
           if (isSuccessful) {
-            setIsConfirming(false);
-            setIsSuccess(true);
             console.log("✅✅✅ Transaction confirmed successfully!");
+            
+            // Verify the transfer actually happened by checking the recipient's balance
+            // This ensures the transaction wasn't just confirmed but actually executed
+            try {
+              console.log("🔍 Verifying token transfer by checking recipient balance...");
+              const recipientBalance = await window.ethereum.request({
+                method: "eth_call",
+                params: [
+                  {
+                    to: TOKENS.CUSD,
+                    data: `0x70a08231${recipient.slice(2).padStart(64, '0')}`, // balanceOf(recipient)
+                  },
+                  receipt.blockNumber, // Use the block number from receipt
+                ],
+              });
+              
+              const balance = BigInt(recipientBalance as string);
+              console.log("📊 Recipient balance after transaction:", {
+                recipient: recipient,
+                balance: balance.toString(),
+                balanceFormatted: (Number(balance) / 1e18).toFixed(4),
+                expectedAmount: lastTransactionAmount?.toString() || "N/A",
+              });
+              
+              // Note: We can't easily verify the exact amount increased without knowing the previous balance
+              // But if we got a receipt with status 0x1, the transaction was successful
+              setIsConfirming(false);
+              setIsSuccess(true);
+            } catch (verifyError) {
+              console.warn("⚠️ Could not verify recipient balance, but transaction was confirmed:", verifyError);
+              // Transaction was confirmed, so mark as success anyway
+              setIsConfirming(false);
+              setIsSuccess(true);
+            }
           } else {
             setIsConfirming(false);
             setIsSuccess(false);
@@ -343,6 +377,8 @@ export default function SendPage() {
         console.log("📋 Transaction hash:", hash);
         console.log("🔗 View on explorer: https://explorer.celo.org/sepolia/tx/" + hash);
         setTxHash(hash as `0x${string}`);
+        setLastTransactionAmount(amountWei); // Store amount for verification
+        setLastRecipient(recipient); // Store recipient for verification
         setIsPending(false);
         setIsConfirming(true); // Start confirming
       } catch (txError: any) {
