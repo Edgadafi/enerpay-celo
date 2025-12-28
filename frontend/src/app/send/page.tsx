@@ -354,6 +354,42 @@ export default function SendPage() {
         }
       }
       
+      // Verify user has sufficient balance before sending
+      console.log("🔍 Checking user balance before transaction...");
+      try {
+        const userBalanceData = `0x70a08231${address.slice(2).padStart(64, '0')}`;
+        const userBalanceHex = await window.ethereum.request({
+          method: "eth_call",
+          params: [
+            {
+              to: TOKENS.CUSD,
+              data: userBalanceData,
+            },
+            "latest",
+          ],
+        });
+        const userBalance = BigInt(userBalanceHex as string);
+        
+        console.log("📊 User balance check:", {
+          balance: userBalance.toString(),
+          balanceFormatted: (Number(userBalance) / 1e18).toFixed(4),
+          amountToSend: amountWei.toString(),
+          amountFormatted: (Number(amountWei) / 1e18).toFixed(4),
+          hasEnough: userBalance >= amountWei,
+        });
+        
+        if (userBalance < amountWei) {
+          throw new Error(`Insufficient cUSD balance. You have ${(Number(userBalance) / 1e18).toFixed(4)} cUSD but need ${(Number(amountWei) / 1e18).toFixed(4)} cUSD.`);
+        }
+      } catch (balanceError: any) {
+        console.error("❌ Balance check error:", balanceError);
+        if (balanceError.message && balanceError.message.includes("Insufficient")) {
+          throw balanceError; // Re-throw if it's a balance error
+        }
+        // If balance check fails due to RPC, still try to send (might be RPC issue)
+        console.warn("⚠️ Could not verify balance, proceeding anyway...");
+      }
+      
       console.log("📝 Sending transaction with window.ethereum.request:", {
         address: TOKENS.CUSD,
         chainId: walletChainId,
