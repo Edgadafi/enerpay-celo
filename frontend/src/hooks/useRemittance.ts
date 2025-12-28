@@ -5,6 +5,7 @@ import { CONTRACTS, CELO_SEPOLIA_CHAIN_ID } from "@/lib/celo/constants";
 import { ENERPAY_REMITTANCE_ABI, RemittanceStatus } from "@/lib/contracts/EnerpayRemittance.abi";
 import { parseCUSD, formatCUSD } from "@/lib/celo/utils";
 import { useChainId } from "wagmi";
+import { getAddress } from "viem";
 
 /**
  * Hook to interact with EnerpayRemittance contract
@@ -14,7 +15,10 @@ export function useRemittance() {
   const chainId = useChainId();
   const isCeloSepolia = chainId === CELO_SEPOLIA_CHAIN_ID;
 
-  const contractAddress = CONTRACTS.ENERPAY_REMITTANCE_SEPOLIA as `0x${string}`;
+  // Normalize contract address (remove whitespace, get checksummed version)
+  const contractAddress = getAddress(
+    CONTRACTS.ENERPAY_REMITTANCE_SEPOLIA.trim()
+  ) as `0x${string}`;
 
   return {
     address,
@@ -131,13 +135,24 @@ export function useSendRemittance() {
     destinationId: string
   ) => {
     const amountWei = parseCUSD(amount);
+    
+    // Normalize beneficiary address to ensure proper format
+    const normalizedBeneficiary = getAddress(beneficiary.trim()) as `0x${string}`;
+
+    console.log("📤 Sending remittance with:", {
+      contractAddress,
+      beneficiary: normalizedBeneficiary,
+      amount: amountWei.toString(),
+      destinationType,
+      destinationId,
+    });
 
     writeContract({
       address: contractAddress,
       abi: ENERPAY_REMITTANCE_ABI,
       functionName: "sendRemittance",
       args: [
-        beneficiary as `0x${string}`,
+        normalizedBeneficiary,
         amountWei,
         destinationType,
         destinationId,

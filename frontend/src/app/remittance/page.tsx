@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useRemittance, useSendRemittance, useCalculateFee } from "@/hooks/useRemittance";
 import { isValidAddress, isValidPhoneNumber, formatPhoneToE164 } from "@/lib/celo/utils";
+import { getAddress } from "viem";
 import { Send, Loader2, Calculator } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Header } from "@/components/Header";
@@ -94,13 +95,23 @@ export default function RemittancePage() {
     try {
       // For mobile/bank, use contract address as beneficiary (funds stay in contract as escrow)
       // In production, this would be resolved via an identity service
-      const finalBeneficiary = 
-        destinationType === "wallet" 
-          ? beneficiary 
-          : contractAddress; // Use contract as escrow for mobile/bank
+      let finalBeneficiary: string;
+      
+      if (destinationType === "wallet") {
+        // Normalize and validate wallet address
+        finalBeneficiary = getAddress(beneficiary.trim());
+      } else {
+        // Normalize contract address (remove any whitespace and get checksummed version)
+        finalBeneficiary = getAddress(contractAddress.trim());
+      }
+      
+      console.log("📤 Final beneficiary address:", finalBeneficiary);
+      console.log("📤 Destination type:", destinationType);
+      console.log("📤 Destination ID:", finalDestinationId);
       
       await sendRemittance(finalBeneficiary, amount, destinationType, finalDestinationId);
     } catch (err) {
+      console.error("❌ Error in handleSend:", err);
       setError(err instanceof Error ? err.message : "Transaction failed");
     }
   };
