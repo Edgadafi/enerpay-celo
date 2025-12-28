@@ -147,30 +147,34 @@ export function useSendRemittance() {
       destinationId,
     });
 
-    try {
-      writeContract({
-        address: contractAddress,
-        abi: ENERPAY_REMITTANCE_ABI,
-        functionName: "sendRemittance",
-        args: [
-          normalizedBeneficiary,
-          amountWei,
-          destinationType,
-          destinationId,
-        ],
-        chainId: CELO_SEPOLIA_CHAIN_ID,
-      });
-    } catch (err: any) {
-      console.error("❌ Error in writeContract:", err);
-      console.error("❌ Error details:", {
-        message: err?.message,
-        code: err?.code,
-        data: err?.data,
-        cause: err?.cause,
-        shortMessage: err?.shortMessage,
-      });
-      throw err;
-    }
+    // Note: writeContract doesn't throw synchronously, errors are captured in the hook's error state
+    // We'll log the attempt and let the hook handle the error
+    console.log("📝 Calling writeContract with params:", {
+      address: contractAddress,
+      functionName: "sendRemittance",
+      args: [
+        normalizedBeneficiary,
+        amountWei.toString(),
+        destinationType,
+        destinationId,
+      ],
+      chainId: CELO_SEPOLIA_CHAIN_ID,
+    });
+    
+    writeContract({
+      address: contractAddress,
+      abi: ENERPAY_REMITTANCE_ABI,
+      functionName: "sendRemittance",
+      args: [
+        normalizedBeneficiary,
+        amountWei,
+        destinationType,
+        destinationId,
+      ],
+      chainId: CELO_SEPOLIA_CHAIN_ID,
+    });
+    
+    console.log("✅ writeContract call initiated (check hook error state for any errors)");
   };
 
   return {

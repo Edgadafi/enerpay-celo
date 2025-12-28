@@ -31,6 +31,20 @@ export default function RemittancePage() {
 
   const { sendRemittance, hash, isPending, isConfirming, isSuccess, error: txError } =
     useSendRemittance();
+  
+  // Log txError when it changes
+  useEffect(() => {
+    if (txError) {
+      console.error("❌ Transaction error from useSendRemittance:", txError);
+      console.error("❌ Error details:", {
+        message: txError?.message,
+        name: txError?.name,
+        cause: txError?.cause,
+        shortMessage: txError?.shortMessage,
+        data: txError?.data,
+      });
+    }
+  }, [txError]);
 
   const { feeFormatted, totalAmountFormatted, isLoading: feeLoading } = useCalculateFee(amount);
   const publicClient = usePublicClient();
