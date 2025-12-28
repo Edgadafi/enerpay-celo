@@ -158,10 +158,48 @@ export default function SendPage() {
               }
             }, 1000);
           } else {
+            // Transaction failed - try to get the revert reason
+            console.error("❌ Transaction failed on-chain. Status:", status);
+            console.error("📋 Failed transaction receipt:", receipt);
+            
+            // Try to get the revert reason using eth_call to simulate the transaction
+            try {
+              console.log("🔍 Attempting to get revert reason...");
+              const tx = await window.ethereum.request({
+                method: "eth_getTransactionByHash",
+                params: [receipt.transactionHash || transactionHash],
+              });
+              
+              if (tx) {
+                // Simulate the transaction to get revert reason
+                try {
+                  await window.ethereum.request({
+                    method: "eth_call",
+                    params: [
+                      {
+                        from: tx.from,
+                        to: tx.to,
+                        data: tx.input,
+                      },
+                      tx.blockNumber,
+                    ],
+                  });
+                } catch (callError: any) {
+                  // Extract revert reason from error
+                  const revertReason = callError?.data || callError?.message || "Unknown error";
+                  console.error("📋 Revert reason:", revertReason);
+                  setError(`Transaction failed: ${revertReason}. Common causes: insufficient balance, contract error, or invalid recipient address.`);
+                }
+              }
+            } catch (error) {
+              console.error("❌ Could not get revert reason:", error);
+            }
+            
             setIsConfirming(false);
             setIsSuccess(false);
-            setError("Transaction failed on-chain");
-            console.error("❌ Transaction failed on-chain. Status:", status);
+            if (!error) {
+              setError("Transaction failed on-chain. Common causes: insufficient cUSD balance, contract error, or invalid recipient address. Please check your balance and try again.");
+            }
           }
         } else {
           // Transaction not yet mined, poll again after 2 seconds
