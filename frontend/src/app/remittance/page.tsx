@@ -564,8 +564,19 @@ export default function RemittancePage() {
 
           {/* Error */}
           {(error || txError) && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-              {error || txError?.message}
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm space-y-2">
+              <div className="font-semibold">❌ Error</div>
+              <div>{error || txError?.message || txError?.shortMessage || "Transaction failed"}</div>
+              {txError && (
+                <details className="text-xs mt-2">
+                  <summary className="cursor-pointer text-red-600 hover:text-red-800">
+                    Show error details
+                  </summary>
+                  <pre className="mt-2 p-2 bg-red-100 rounded text-xs overflow-auto">
+                    {JSON.stringify(txError, null, 2)}
+                  </pre>
+                </details>
+              )}
             </div>
           )}
 
