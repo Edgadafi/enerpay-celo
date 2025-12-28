@@ -61,9 +61,9 @@ async function main() {
 
   // cUSD addresses for different networks
   const CUSD_ADDRESSES = {
-    celoSepolia: "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1", // Celo Sepolia Testnet
-    alfajores: "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1",
-    celo: "0x765DE816845861e75A25fCA122bb6898B8B1282a",
+    celoSepolia: "0xdE9e4C3ce781b4bA68120d6261cbad65ce0aB00b", // Celo Sepolia Testnet - Official contract
+    alfajores: "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1", // Alfajores (legacy testnet)
+    celo: "0x765DE816845861e75A25fCA122bb6898B8B1282a", // Celo Mainnet
     hardhat: "0x0000000000000000000000000000000000000000", // Mock for local testing
     localhost: "0x0000000000000000000000000000000000000000", // Mock for local testing
   };
