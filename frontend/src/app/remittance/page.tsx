@@ -3,12 +3,12 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { useAccount, usePublicClient } from "wagmi";
+import { useAccount, usePublicClient, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { useRemittance, useSendRemittance, useCalculateFee } from "@/hooks/useRemittance";
-import { isValidAddress, isValidPhoneNumber, formatPhoneToE164 } from "@/lib/celo/utils";
-import { getAddress, formatUnits } from "viem";
+import { isValidAddress, isValidPhoneNumber, formatPhoneToE164, parseCUSD } from "@/lib/celo/utils";
+import { getAddress, formatUnits, maxUint256 } from "viem";
 import { erc20Abi } from "viem";
-import { TOKENS } from "@/lib/celo/constants";
+import { TOKENS, CELO_SEPOLIA_CHAIN_ID } from "@/lib/celo/constants";
 import { Send, Loader2, Calculator } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Header } from "@/components/Header";
@@ -33,8 +33,16 @@ export default function RemittancePage() {
 
   const { feeFormatted, totalAmountFormatted, isLoading: feeLoading } = useCalculateFee(amount);
   const publicClient = usePublicClient();
+  const { writeContract: writeApprove, data: approveHash, isPending: isApproving } = useWriteContract();
+  const { isLoading: isApprovingConfirming } = useWaitForTransactionReceipt({
+    hash: approveHash,
+    chainId: CELO_SEPOLIA_CHAIN_ID,
+  });
+  
   const [contractBalance, setContractBalance] = useState<string | null>(null);
   const [verificationStatus, setVerificationStatus] = useState<"idle" | "checking" | "verified" | "failed">("idle");
+  const [needsApproval, setNeedsApproval] = useState(false);
+  const [isCheckingAllowance, setIsCheckingAllowance] = useState(false);
 
   // Verify transaction and contract balance after success
   useEffect(() => {
@@ -72,6 +80,55 @@ export default function RemittancePage() {
       setVerificationStatus("idle");
     }
   }, [isSuccess, hash, destinationType, contractAddress, publicClient]);
+
+  // After approval completes, automatically send remittance
+  useEffect(() => {
+    if (needsApproval && approveHash && !isApproving && !isApprovingConfirming) {
+      console.log("✅ Approval completed, sending remittance...");
+      // Trigger remittance send after approval
+      const sendAfterApproval = async () => {
+        try {
+          const amountWei = parseCUSD(amount);
+          const feeWei = parseCUSD(feeFormatted || "0");
+          const totalAmountWei = amountWei + feeWei;
+          
+          // Double-check allowance
+          if (publicClient && address) {
+            const currentAllowance = await publicClient.readContract({
+              address: TOKENS.CUSD,
+              abi: erc20Abi,
+              functionName: "allowance",
+              args: [address, contractAddress],
+            });
+            
+            if (currentAllowance >= totalAmountWei) {
+              setNeedsApproval(false);
+              
+              let finalBeneficiary: string;
+              if (destinationType === "wallet") {
+                finalBeneficiary = getAddress(beneficiary.trim());
+              } else {
+                finalBeneficiary = getAddress(contractAddress.trim());
+              }
+              
+              await sendRemittance(finalBeneficiary, amount, destinationType, destinationId);
+            }
+          }
+        } catch (err) {
+          console.error("❌ Error sending after approval:", err);
+          setError(err instanceof Error ? err.message : "Failed to send after approval");
+        }
+      };
+      
+      // Small delay to ensure approval is fully processed
+      const timer = setTimeout(() => {
+        sendAfterApproval();
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needsApproval, approveHash, isApproving, isApprovingConfirming]);
 
   const handleSend = async () => {
     setError("");
@@ -135,6 +192,44 @@ export default function RemittancePage() {
     }
 
     try {
+      // Calculate total amount needed (amount + fee)
+      const amountWei = parseCUSD(amount);
+      const feeWei = parseCUSD(feeFormatted || "0");
+      const totalAmountWei = amountWei + feeWei;
+      
+      // Check allowance before sending
+      setIsCheckingAllowance(true);
+      if (publicClient && address) {
+        const currentAllowance = await publicClient.readContract({
+          address: TOKENS.CUSD,
+          abi: erc20Abi,
+          functionName: "allowance",
+          args: [address, contractAddress],
+        });
+        
+        console.log("🔍 Current allowance:", formatUnits(currentAllowance as bigint, 18), "cUSD");
+        console.log("🔍 Total amount needed:", formatUnits(totalAmountWei, 18), "cUSD");
+        
+        if (currentAllowance < totalAmountWei) {
+          console.log("⚠️ Insufficient allowance, requesting approval...");
+          setNeedsApproval(true);
+          setIsCheckingAllowance(false);
+          
+          // Request approval
+          writeApprove({
+            address: TOKENS.CUSD,
+            abi: erc20Abi,
+            functionName: "approve",
+            args: [contractAddress, maxUint256], // Approve max for convenience
+            chainId: CELO_SEPOLIA_CHAIN_ID,
+          });
+          
+          return; // Wait for approval to complete
+        }
+      }
+      setIsCheckingAllowance(false);
+      setNeedsApproval(false);
+      
       // For mobile/bank, use contract address as beneficiary (funds stay in contract as escrow)
       // In production, this would be resolved via an identity service
       let finalBeneficiary: string;
@@ -154,6 +249,7 @@ export default function RemittancePage() {
       await sendRemittance(finalBeneficiary, amount, destinationType, finalDestinationId);
     } catch (err) {
       console.error("❌ Error in handleSend:", err);
+      setIsCheckingAllowance(false);
       setError(err instanceof Error ? err.message : "Transaction failed");
     }
   };
@@ -430,16 +526,37 @@ export default function RemittancePage() {
             </div>
           )}
 
+          {/* Approval Status */}
+          {needsApproval && (
+            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-xl text-sm">
+              <p className="font-semibold">⚠️ Approval Required</p>
+              <p className="text-xs mt-1">
+                Please approve the contract to spend your cUSD. This is a one-time action per wallet.
+              </p>
+              {(isApproving || isApprovingConfirming) && (
+                <p className="text-xs mt-2 italic">⏳ Waiting for approval confirmation...</p>
+              )}
+            </div>
+          )}
+
           {/* Send Button */}
           <button
             onClick={handleSend}
-            disabled={isPending || isConfirming}
+            disabled={isPending || isConfirming || isCheckingAllowance || isApproving || isApprovingConfirming}
             className="w-full bg-celo-green text-white py-4 px-6 rounded-xl font-semibold shadow-md hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {isPending || isConfirming ? (
+            {(isPending || isConfirming || isCheckingAllowance || isApproving || isApprovingConfirming) ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>{isPending ? "Confirming..." : "Processing..."}</span>
+                <span>
+                  {isCheckingAllowance 
+                    ? "Checking allowance..." 
+                    : isApproving || isApprovingConfirming
+                    ? "Approving..."
+                    : isPending 
+                    ? "Confirming..." 
+                    : "Processing..."}
+                </span>
               </>
             ) : (
               <>
