@@ -3,10 +3,10 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { useAccount, usePublicClient, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { useRemittance, useSendRemittance, useCalculateFee } from "@/hooks/useRemittance";
+import { useAccount, usePublicClient, useWriteContract, useWaitForTransactionReceipt, useChainId } from "wagmi";
+import { useRemittance, useCalculateFee } from "@/hooks/useRemittance";
 import { isValidAddress, isValidPhoneNumber, formatPhoneToE164, parseCUSD } from "@/lib/celo/utils";
-import { getAddress, formatUnits, maxUint256 } from "viem";
+import { getAddress, formatUnits, maxUint256, encodeFunctionData } from "viem";
 import { erc20Abi } from "viem";
 import { TOKENS, CELO_SEPOLIA_CHAIN_ID } from "@/lib/celo/constants";
 import { ENERPAY_REMITTANCE_ABI } from "@/lib/contracts/EnerpayRemittance.abi";
@@ -28,31 +28,10 @@ export default function RemittancePage() {
   const [destinationType, setDestinationType] = useState("mobile"); // Default to mobile for better UX
   const [destinationId, setDestinationId] = useState("");
   const [error, setError] = useState("");
-
-  const { sendRemittance, hash, isPending, isConfirming, isSuccess, error: txError } =
-    useSendRemittance();
-  
-  // Log txError when it changes
-  useEffect(() => {
-    if (txError) {
-      console.error("❌ Transaction error from useSendRemittance:", txError);
-      const errorDetails: any = {
-        message: txError?.message,
-        name: txError?.name,
-      };
-      // Only access properties that might exist
-      if ('cause' in txError) {
-        errorDetails.cause = (txError as any).cause;
-      }
-      if ('data' in txError) {
-        errorDetails.data = (txError as any).data;
-      }
-      if ('shortMessage' in txError) {
-        errorDetails.shortMessage = (txError as any).shortMessage;
-      }
-      console.error("❌ Error details:", errorDetails);
-    }
-  }, [txError]);
+  const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
+  const [isPending, setIsPending] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const { feeFormatted, totalAmountFormatted, isLoading: feeLoading } = useCalculateFee(amount);
   const publicClient = usePublicClient();
@@ -73,7 +52,7 @@ export default function RemittancePage() {
 
   // Verify transaction and contract balance after success
   useEffect(() => {
-    if (isSuccess && hash && (destinationType === "mobile" || destinationType === "bank")) {
+    if (isSuccess && txHash && (destinationType === "mobile" || destinationType === "bank")) {
       const verifyTransaction = async () => {
         setVerificationStatus("checking");
         try {
@@ -106,7 +85,7 @@ export default function RemittancePage() {
       setContractBalance(null);
       setVerificationStatus("idle");
     }
-  }, [isSuccess, hash, destinationType, contractAddress, publicClient]);
+  }, [isSuccess, txHash, destinationType, contractAddress, publicClient]);
 
   // After approval completes, automatically send remittance
   useEffect(() => {
@@ -166,7 +145,7 @@ export default function RemittancePage() {
             console.log("✅ Allowance sufficient, sending remittance...");
             setNeedsApproval(false);
             
-            let finalBeneficiary: string;
+            let finalBeneficiary: `0x${string}`;
             if (destinationType === "wallet") {
               finalBeneficiary = getAddress(beneficiary.trim());
             } else {
@@ -180,8 +159,87 @@ export default function RemittancePage() {
               destinationId,
             });
             
-            await sendRemittance(finalBeneficiary, amount, destinationType, destinationId);
-            console.log("✅ sendRemittance called successfully");
+            // After approval, send the remittance using window.ethereum.request directly
+            console.log("✅ Approval complete, sending remittance...");
+            setNeedsApproval(false);
+            
+            // Send remittance using window.ethereum.request (same as handleSend but without approval check)
+            try {
+              if (typeof window === "undefined" || !window.ethereum) {
+                throw new Error("Ethereum provider not available");
+              }
+              
+              // Verify chain
+              const currentChain = await window.ethereum.request({
+                method: "eth_chainId",
+              });
+              
+              if (parseInt(currentChain as string, 16) !== CELO_SEPOLIA_CHAIN_ID) {
+                throw new Error(`Please switch to Celo Sepolia. Current chain: ${parseInt(currentChain as string, 16)}`);
+              }
+              
+              // Encode function call
+              const data = encodeFunctionData({
+                abi: ENERPAY_REMITTANCE_ABI,
+                functionName: "sendRemittance",
+                args: [finalBeneficiary, amountWei, destinationType, destinationId],
+              });
+              
+              setIsPending(true);
+              setError("");
+              
+              const hash = await window.ethereum.request({
+                method: "eth_sendTransaction",
+                params: [
+                  {
+                    from: address,
+                    to: contractAddress,
+                    data: data,
+                  },
+                ],
+              });
+              
+              console.log("✅ Transaction hash received:", hash);
+              setTxHash(hash as `0x${string}`);
+              setIsPending(false);
+              setIsConfirming(true);
+              
+              // Poll for receipt
+              const checkTransaction = async () => {
+                try {
+                  const receipt = await window.ethereum.request({
+                    method: "eth_getTransactionReceipt",
+                    params: [hash],
+                  });
+                  
+                  if (receipt) {
+                    const status = receipt.status;
+                    const isSuccessful = status === "0x1" || status === 1;
+                    
+                    if (isSuccessful) {
+                      setIsConfirming(false);
+                      setIsSuccess(true);
+                    } else {
+                      setIsConfirming(false);
+                      setError("Transaction failed on-chain");
+                    }
+                  } else {
+                    setTimeout(checkTransaction, 2000);
+                  }
+                } catch (err) {
+                  console.error("❌ Error checking transaction:", err);
+                  setTimeout(checkTransaction, 2000);
+                }
+              };
+              
+              setTimeout(checkTransaction, 2000);
+            } catch (sendErr: any) {
+              console.error("❌ Error sending remittance after approval:", sendErr);
+              setError(sendErr?.message || "Failed to send remittance");
+              setIsPending(false);
+              setIsConfirming(false);
+            }
+            return;
           } else {
             console.error("❌ Allowance still insufficient after approval");
             setError("Approval completed but allowance is still insufficient. Please try again.");
@@ -328,7 +386,7 @@ export default function RemittancePage() {
       
       // For mobile/bank, use contract address as beneficiary (funds stay in contract as escrow)
       // In production, this would be resolved via an identity service
-      let finalBeneficiary: string;
+      let finalBeneficiary: `0x${string}`;
       
       if (destinationType === "wallet") {
         // Normalize and validate wallet address
@@ -342,32 +400,102 @@ export default function RemittancePage() {
       console.log("📤 Destination type:", destinationType);
       console.log("📤 Destination ID:", finalDestinationId);
       
+      // Use window.ethereum.request directly to get better error messages
+      if (typeof window === "undefined" || !window.ethereum) {
+        throw new Error("Ethereum provider not available");
+      }
+      
+      // Verify we're on the correct chain
+      const currentChain = await window.ethereum.request({
+        method: "eth_chainId",
+      });
+      
+      if (parseInt(currentChain as string, 16) !== CELO_SEPOLIA_CHAIN_ID) {
+        throw new Error(`Please switch to Celo Sepolia. Current chain: ${parseInt(currentChain as string, 16)}`);
+      }
+      
+      // Encode the function call
+      const data = encodeFunctionData({
+        abi: ENERPAY_REMITTANCE_ABI,
+        functionName: "sendRemittance",
+        args: [finalBeneficiary, amountWei, destinationType, finalDestinationId],
+      });
+      
+      console.log("📤 Sending transaction with window.ethereum.request:", {
+        from: address,
+        to: contractAddress,
+        data: data.substring(0, 50) + "...",
+      });
+      
+      setIsPending(true);
+      setError("");
+      
       try {
-        await sendRemittance(finalBeneficiary, amount, destinationType, finalDestinationId);
-        console.log("✅ sendRemittance called successfully");
-      } catch (sendErr: any) {
-        console.error("❌ Error calling sendRemittance:", sendErr);
-        console.error("❌ Error details:", {
-          message: sendErr?.message,
-          code: sendErr?.code,
-          data: sendErr?.data,
-          cause: sendErr?.cause,
-          shortMessage: sendErr?.shortMessage,
+        const hash = await window.ethereum.request({
+          method: "eth_sendTransaction",
+          params: [
+            {
+              from: address,
+              to: contractAddress,
+              data: data,
+            },
+          ],
         });
         
-        // Extract more detailed error message
-        let errorMessage = "Transaction failed";
-        if (sendErr?.shortMessage) {
-          errorMessage = sendErr.shortMessage;
-        } else if (sendErr?.message) {
-          errorMessage = sendErr.message;
-        } else if (sendErr?.data?.message) {
-          errorMessage = sendErr.data.message;
-        }
+        console.log("✅ Transaction hash received:", hash);
+        setTxHash(hash as `0x${string}`);
+        setIsPending(false);
+        setIsConfirming(true);
         
-        setError(errorMessage);
-        setIsCheckingAllowance(false);
-        throw sendErr; // Re-throw to prevent further execution
+        // Poll for transaction receipt
+        const checkTransaction = async () => {
+          try {
+            const receipt = await window.ethereum.request({
+              method: "eth_getTransactionReceipt",
+              params: [hash],
+            });
+            
+            if (receipt) {
+              const status = receipt.status;
+              const isSuccessful = status === "0x1" || status === 1;
+              
+              console.log("📋 Transaction receipt:", {
+                status,
+                isSuccessful,
+                blockNumber: receipt.blockNumber,
+              });
+              
+              if (isSuccessful) {
+                setIsConfirming(false);
+                setIsSuccess(true);
+              } else {
+                setIsConfirming(false);
+                setError("Transaction failed on-chain");
+              }
+            } else {
+              // Transaction not yet mined, check again
+              setTimeout(checkTransaction, 2000);
+            }
+          } catch (err) {
+            console.error("❌ Error checking transaction:", err);
+            setTimeout(checkTransaction, 2000);
+          }
+        };
+        
+        // Start checking after a delay
+        setTimeout(checkTransaction, 2000);
+      } catch (txErr: any) {
+        console.error("❌ Transaction error from window.ethereum.request:", txErr);
+        console.error("❌ Error details:", {
+          message: txErr?.message,
+          code: txErr?.code,
+          data: txErr?.data,
+        });
+        
+        setIsPending(false);
+        setIsConfirming(false);
+        setError(txErr?.message || "Transaction failed");
+        throw txErr;
       }
     } catch (err) {
       console.error("❌ Error in handleSend:", err);
@@ -571,25 +699,10 @@ export default function RemittancePage() {
           )}
 
           {/* Error */}
-          {(error || txError) && (
+          {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm space-y-2">
               <div className="font-semibold">❌ Error</div>
-              <div>
-                {error || 
-                 txError?.message || 
-                 ('shortMessage' in (txError || {}) ? (txError as any).shortMessage : null) ||
-                 "Transaction failed"}
-              </div>
-              {txError && (
-                <details className="text-xs mt-2">
-                  <summary className="cursor-pointer text-red-600 hover:text-red-800">
-                    Show error details
-                  </summary>
-                  <pre className="mt-2 p-2 bg-red-100 rounded text-xs overflow-auto">
-                    {JSON.stringify(txError, null, 2)}
-                  </pre>
-                </details>
-              )}
+              <div>{error}</div>
             </div>
           )}
 
@@ -639,20 +752,20 @@ export default function RemittancePage() {
                 </div>
               )}
               
-              {hash && (
+              {txHash && (
                 <div className="mt-2 space-y-1">
                   <div className="text-xs text-gray-600">Transaction Hash:</div>
                   <div className="flex flex-col gap-1">
                     <a
-                      href={`https://sepolia.celoscan.io/tx/${hash}`}
+                      href={`https://sepolia.celoscan.io/tx/${txHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs underline break-all"
                     >
-                      View on CeloScan: {hash.slice(0, 10)}...{hash.slice(-8)}
+                      View on CeloScan: {txHash.slice(0, 10)}...{txHash.slice(-8)}
                     </a>
                     <a
-                      href={`https://explorer.celo.org/sepolia/tx/${hash}`}
+                      href={`https://explorer.celo.org/sepolia/tx/${txHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs underline break-all"
