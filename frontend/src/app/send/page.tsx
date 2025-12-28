@@ -339,9 +339,12 @@ export default function SendPage() {
           ],
         });
         
-        console.log("✅✅✅ Transaction sent successfully, hash:", hash);
+        console.log("✅✅✅ Transaction hash received:", hash);
+        console.log("📋 Transaction hash:", hash);
+        console.log("🔗 View on explorer: https://explorer.celo.org/sepolia/tx/" + hash);
         setTxHash(hash as `0x${string}`);
         setIsPending(false);
+        setIsConfirming(true); // Start confirming
       } catch (txError: any) {
         console.error("❌❌❌ Transaction error from window.ethereum.request:", txError);
         console.error("❌ Error details:", {
@@ -437,10 +440,41 @@ export default function SendPage() {
             </div>
           )}
 
+          {/* Transaction Hash (while confirming) */}
+          {transactionHash && !isSuccess && (
+            <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-xl text-sm">
+              <div className="font-semibold mb-1">
+                {isConfirming ? "⏳ Transaction pending confirmation..." : "📋 Transaction submitted"}
+              </div>
+              <div className="text-xs font-mono break-all mb-2">{transactionHash}</div>
+              <a
+                href={`https://explorer.celo.org/sepolia/tx/${transactionHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-xs hover:text-blue-900"
+              >
+                View on Celo Explorer →
+              </a>
+            </div>
+          )}
+
           {/* Success */}
           {isSuccess && (
             <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm">
-              Payment sent successfully!
+              <div className="font-semibold mb-1">✅ Payment sent successfully!</div>
+              {transactionHash && (
+                <div className="mt-2">
+                  <div className="text-xs font-mono break-all mb-2">{transactionHash}</div>
+                  <a
+                    href={`https://explorer.celo.org/sepolia/tx/${transactionHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-xs hover:text-green-900"
+                  >
+                    View transaction on Celo Explorer →
+                  </a>
+                </div>
+              )}
             </div>
           )}
 
