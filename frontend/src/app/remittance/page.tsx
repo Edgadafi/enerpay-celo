@@ -448,8 +448,11 @@ export default function RemittancePage() {
         setIsConfirming(true);
         
         // Poll for transaction receipt
+        let attempts = 0;
+        const maxAttempts = 30; // 60 seconds max
         const checkTransaction = async () => {
           try {
+            attempts++;
             const receipt = await window.ethereum.request({
               method: "eth_getTransactionReceipt",
               params: [hash],
@@ -463,22 +466,54 @@ export default function RemittancePage() {
                 status,
                 isSuccessful,
                 blockNumber: receipt.blockNumber,
+                gasUsed: receipt.gasUsed,
               });
               
               if (isSuccessful) {
                 setIsConfirming(false);
                 setIsSuccess(true);
               } else {
+                // Transaction failed - try to get revert reason
+                console.error("❌ Transaction failed on-chain. Status: 0x0");
+                
+                // Try to get the transaction to see if there's error data
+                try {
+                  const tx = await window.ethereum.request({
+                    method: "eth_getTransactionByHash",
+                    params: [hash],
+                  });
+                  
+                  console.error("❌ Failed transaction details:", {
+                    hash,
+                    from: tx.from,
+                    to: tx.to,
+                    input: tx.input?.substring(0, 100),
+                  });
+                } catch (txErr) {
+                  console.error("❌ Could not get transaction details:", txErr);
+                }
+                
                 setIsConfirming(false);
-                setError("Transaction failed on-chain");
+                setError(
+                  `Transaction failed on-chain. ` +
+                  `View details: https://sepolia.celoscan.io/tx/${hash}`
+                );
               }
-            } else {
+            } else if (attempts < maxAttempts) {
               // Transaction not yet mined, check again
               setTimeout(checkTransaction, 2000);
+            } else {
+              setIsConfirming(false);
+              setError("Transaction timeout - please check the explorer manually");
             }
           } catch (err) {
             console.error("❌ Error checking transaction:", err);
-            setTimeout(checkTransaction, 2000);
+            if (attempts < maxAttempts) {
+              setTimeout(checkTransaction, 2000);
+            } else {
+              setIsConfirming(false);
+              setError("Error checking transaction status");
+            }
           }
         };
         
