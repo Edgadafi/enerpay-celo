@@ -33,16 +33,20 @@ export default function RemittancePage() {
 
   const { feeFormatted, totalAmountFormatted, isLoading: feeLoading } = useCalculateFee(amount);
   const publicClient = usePublicClient();
+  const [needsApproval, setNeedsApproval] = useState(false);
+  const [isCheckingAllowance, setIsCheckingAllowance] = useState(false);
+  
   const { writeContract: writeApprove, data: approveHash, isPending: isApproving } = useWriteContract();
-  const { isLoading: isApprovingConfirming } = useWaitForTransactionReceipt({
+  const { isLoading: isApprovingConfirming, isSuccess: isApprovalSuccess } = useWaitForTransactionReceipt({
     hash: approveHash,
     chainId: CELO_SEPOLIA_CHAIN_ID,
+    query: {
+      enabled: !!approveHash && needsApproval,
+    },
   });
   
   const [contractBalance, setContractBalance] = useState<string | null>(null);
   const [verificationStatus, setVerificationStatus] = useState<"idle" | "checking" | "verified" | "failed">("idle");
-  const [needsApproval, setNeedsApproval] = useState(false);
-  const [isCheckingAllowance, setIsCheckingAllowance] = useState(false);
 
   // Verify transaction and contract balance after success
   useEffect(() => {
@@ -83,44 +87,94 @@ export default function RemittancePage() {
 
   // After approval completes, automatically send remittance
   useEffect(() => {
-    if (needsApproval && approveHash && !isApproving && !isApprovingConfirming) {
-      console.log("✅ Approval completed, sending remittance...");
-      // Trigger remittance send after approval
-      const sendAfterApproval = async () => {
-        try {
-          const amountWei = parseCUSD(amount);
-          const feeWei = parseCUSD(feeFormatted || "0");
-          const totalAmountWei = amountWei + feeWei;
+    const sendAfterApproval = async () => {
+      if (!needsApproval || !approveHash) {
+        console.log("⏸️ Skipping - needsApproval:", needsApproval, "approveHash:", approveHash);
+        return;
+      }
+      
+      // Wait for approval to be confirmed
+      if (isApproving || isApprovingConfirming) {
+        console.log("⏳ Still waiting for approval confirmation...", {
+          isApproving,
+          isApprovingConfirming,
+          isApprovalSuccess,
+        });
+        return;
+      }
+      
+      // Only proceed if approval was successful
+      if (!isApprovalSuccess) {
+        console.log("⏸️ Approval not yet successful, waiting...");
+        return;
+      }
+      
+      console.log("✅ Approval completed successfully, preparing to send remittance...");
+      console.log("📊 Current state:", {
+        needsApproval,
+        approveHash,
+        isApproving,
+        isApprovingConfirming,
+        isApprovalSuccess,
+        amount,
+        destinationType,
+        destinationId,
+      });
+      
+      try {
+        const amountWei = parseCUSD(amount);
+        const feeWei = parseCUSD(feeFormatted || "0");
+        const totalAmountWei = amountWei + feeWei;
+        
+        // Double-check allowance
+        if (publicClient && address) {
+          console.log("🔍 Checking allowance after approval...");
+          const currentAllowance = await publicClient.readContract({
+            address: TOKENS.CUSD,
+            abi: erc20Abi,
+            functionName: "allowance",
+            args: [address, contractAddress],
+          });
           
-          // Double-check allowance
-          if (publicClient && address) {
-            const currentAllowance = await publicClient.readContract({
-              address: TOKENS.CUSD,
-              abi: erc20Abi,
-              functionName: "allowance",
-              args: [address, contractAddress],
+          console.log("🔍 Allowance after approval:", formatUnits(currentAllowance as bigint, 18), "cUSD");
+          console.log("🔍 Total amount needed:", formatUnits(totalAmountWei, 18), "cUSD");
+          
+          if (currentAllowance >= totalAmountWei) {
+            console.log("✅ Allowance sufficient, sending remittance...");
+            setNeedsApproval(false);
+            
+            let finalBeneficiary: string;
+            if (destinationType === "wallet") {
+              finalBeneficiary = getAddress(beneficiary.trim());
+            } else {
+              finalBeneficiary = getAddress(contractAddress.trim());
+            }
+            
+            console.log("📤 Calling sendRemittance with:", {
+              finalBeneficiary,
+              amount,
+              destinationType,
+              destinationId,
             });
             
-            if (currentAllowance >= totalAmountWei) {
-              setNeedsApproval(false);
-              
-              let finalBeneficiary: string;
-              if (destinationType === "wallet") {
-                finalBeneficiary = getAddress(beneficiary.trim());
-              } else {
-                finalBeneficiary = getAddress(contractAddress.trim());
-              }
-              
-              await sendRemittance(finalBeneficiary, amount, destinationType, destinationId);
-            }
+            await sendRemittance(finalBeneficiary, amount, destinationType, destinationId);
+            console.log("✅ sendRemittance called successfully");
+          } else {
+            console.error("❌ Allowance still insufficient after approval");
+            setError("Approval completed but allowance is still insufficient. Please try again.");
+            setNeedsApproval(false);
           }
-        } catch (err) {
-          console.error("❌ Error sending after approval:", err);
-          setError(err instanceof Error ? err.message : "Failed to send after approval");
         }
-      };
-      
-      // Small delay to ensure approval is fully processed
+      } catch (err) {
+        console.error("❌ Error sending after approval:", err);
+        setError(err instanceof Error ? err.message : "Failed to send after approval");
+        setNeedsApproval(false);
+      }
+    };
+    
+    // Only run if we're waiting for approval and have an approval hash
+    if (needsApproval && approveHash && !isApproving && !isApprovingConfirming && isApprovalSuccess) {
+      // Small delay to ensure everything is ready
       const timer = setTimeout(() => {
         sendAfterApproval();
       }, 1000);
@@ -128,7 +182,7 @@ export default function RemittancePage() {
       return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [needsApproval, approveHash, isApproving, isApprovingConfirming]);
+  }, [needsApproval, approveHash, isApproving, isApprovingConfirming, isApprovalSuccess]);
 
   const handleSend = async () => {
     setError("");
