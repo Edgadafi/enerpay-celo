@@ -300,11 +300,38 @@ export default function RemittancePage() {
       console.log("📤 Destination type:", destinationType);
       console.log("📤 Destination ID:", finalDestinationId);
       
-      await sendRemittance(finalBeneficiary, amount, destinationType, finalDestinationId);
+      try {
+        await sendRemittance(finalBeneficiary, amount, destinationType, finalDestinationId);
+        console.log("✅ sendRemittance called successfully");
+      } catch (sendErr: any) {
+        console.error("❌ Error calling sendRemittance:", sendErr);
+        console.error("❌ Error details:", {
+          message: sendErr?.message,
+          code: sendErr?.code,
+          data: sendErr?.data,
+          cause: sendErr?.cause,
+          shortMessage: sendErr?.shortMessage,
+        });
+        
+        // Extract more detailed error message
+        let errorMessage = "Transaction failed";
+        if (sendErr?.shortMessage) {
+          errorMessage = sendErr.shortMessage;
+        } else if (sendErr?.message) {
+          errorMessage = sendErr.message;
+        } else if (sendErr?.data?.message) {
+          errorMessage = sendErr.data.message;
+        }
+        
+        setError(errorMessage);
+        setIsCheckingAllowance(false);
+        throw sendErr; // Re-throw to prevent further execution
+      }
     } catch (err) {
       console.error("❌ Error in handleSend:", err);
       setIsCheckingAllowance(false);
-      setError(err instanceof Error ? err.message : "Transaction failed");
+      const errorMessage = err instanceof Error ? err.message : "Transaction failed";
+      setError(errorMessage);
     }
   };
 

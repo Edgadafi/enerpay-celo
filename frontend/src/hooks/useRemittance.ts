@@ -147,18 +147,30 @@ export function useSendRemittance() {
       destinationId,
     });
 
-    writeContract({
-      address: contractAddress,
-      abi: ENERPAY_REMITTANCE_ABI,
-      functionName: "sendRemittance",
-      args: [
-        normalizedBeneficiary,
-        amountWei,
-        destinationType,
-        destinationId,
-      ],
-      chainId: CELO_SEPOLIA_CHAIN_ID,
-    });
+    try {
+      writeContract({
+        address: contractAddress,
+        abi: ENERPAY_REMITTANCE_ABI,
+        functionName: "sendRemittance",
+        args: [
+          normalizedBeneficiary,
+          amountWei,
+          destinationType,
+          destinationId,
+        ],
+        chainId: CELO_SEPOLIA_CHAIN_ID,
+      });
+    } catch (err: any) {
+      console.error("❌ Error in writeContract:", err);
+      console.error("❌ Error details:", {
+        message: err?.message,
+        code: err?.code,
+        data: err?.data,
+        cause: err?.cause,
+        shortMessage: err?.shortMessage,
+      });
+      throw err;
+    }
   };
 
   return {
