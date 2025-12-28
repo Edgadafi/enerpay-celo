@@ -26,8 +26,8 @@ const celoSepolia = {
 } as const;
 
 // Celo Mainnet Configuration
+// IMPORTANT: Don't spread ...celo as it might cause chain resolution issues
 const celoMainnet = {
-  ...celo,
   id: 42220,
   name: "Celo",
   nativeCurrency: {
@@ -46,7 +46,8 @@ const celoMainnet = {
       url: "https://celoscan.io",
     },
   },
-};
+  testnet: false,
+} as const;
 
 // Get WalletConnect Project ID from environment
 // IMPORTANT: You must set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in .env.local
@@ -73,15 +74,15 @@ if (!isValidProjectId) {
 // Wagmi configuration with Celo support
 // Note: projectId is required for WalletConnect, but we can work without it for local development
 // For production, you MUST set a valid projectId in .env.local
+// TEMPORARY FIX: Use only Celo Sepolia for testing to avoid chain resolution issues
+// TODO: Re-enable all chains once the chain mismatch issue is resolved
 export const config = getDefaultConfig({
   appName: process.env.NEXT_PUBLIC_APP_NAME || "Enerpay",
   projectId: isValidProjectId ? projectId : "00000000000000000000000000000000", // Required by getDefaultConfig
-  chains: [celoSepolia, celoMainnet, celoAlfajores], // Celo Sepolia first (testnet)
+  chains: [celoSepolia], // ONLY Celo Sepolia for now to fix chain mismatch
   ssr: true, // Enable SSR support
   transports: {
     [celoSepolia.id]: http(),
-    [celoMainnet.id]: http(),
-    [celoAlfajores.id]: http(),
   },
 });
 
