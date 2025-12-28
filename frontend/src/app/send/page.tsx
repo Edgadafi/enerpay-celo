@@ -101,11 +101,21 @@ export default function SendPage() {
           const status = receipt.status;
           const isSuccessful = status === "0x1" || status === 1 || status === "0x01";
           
+          // Get the actual transaction hash from receipt (more reliable)
+          const actualTxHash = receipt.transactionHash || transactionHash;
+          
           console.log("📊 Transaction status:", {
             status,
             isSuccessful,
             blockNumber: receipt.blockNumber,
             gasUsed: receipt.gasUsed,
+            transactionHash: actualTxHash,
+            blockHash: receipt.blockHash,
+          });
+          
+          console.log("🔗 Transaction links:", {
+            explorer: `https://explorer.celo.org/sepolia/tx/${actualTxHash}`,
+            celoscan: `https://sepolia.celoscan.io/tx/${actualTxHash}`,
           });
           
           if (isSuccessful) {
