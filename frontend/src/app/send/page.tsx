@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useConfig, useWalletClient, useSwitchChain } from "wagmi";
+import { useAccount, useChainId, useConfig, useWalletClient, useSwitchChain } from "wagmi";
 import { parseCUSD, isValidAddress } from "@/lib/celo/utils";
 import { CELO_SEPOLIA_CHAIN_ID, CELO_MAINNET_CHAIN_ID, TOKENS } from "@/lib/celo/constants";
 import { erc20Abi, encodeFunctionData, toHex } from "viem";
@@ -73,11 +73,67 @@ export default function SendPage() {
   // Use txHash state for transaction tracking
   const transactionHash = txHash;
   
-  const { isLoading: isConfirming, isSuccess } =
-    useWaitForTransactionReceipt({
-      hash: transactionHash,
-      chainId: CELO_SEPOLIA_CHAIN_ID, // Use constant directly
-    });
+  // Track transaction status manually since we're not using wagmi
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  
+  // Poll for transaction receipt when we have a hash
+  useEffect(() => {
+    if (!transactionHash || typeof window === "undefined" || !window.ethereum) return;
+    
+    setIsConfirming(true);
+    setIsSuccess(false);
+    
+    const checkTransaction = async () => {
+      try {
+        console.log("🔍 Checking transaction receipt for:", transactionHash);
+        const receipt = await window.ethereum.request({
+          method: "eth_getTransactionReceipt",
+          params: [transactionHash],
+        });
+        
+        console.log("📋 Transaction receipt:", receipt);
+        
+        if (receipt) {
+          // Check if transaction was successful (status === "0x1" or status === 1)
+          const status = receipt.status;
+          const isSuccessful = status === "0x1" || status === 1 || status === "0x01";
+          
+          console.log("📊 Transaction status:", {
+            status,
+            isSuccessful,
+            blockNumber: receipt.blockNumber,
+            gasUsed: receipt.gasUsed,
+          });
+          
+          if (isSuccessful) {
+            setIsConfirming(false);
+            setIsSuccess(true);
+            console.log("✅✅✅ Transaction confirmed successfully!");
+          } else {
+            setIsConfirming(false);
+            setIsSuccess(false);
+            setError("Transaction failed on-chain");
+            console.error("❌ Transaction failed on-chain. Status:", status);
+          }
+        } else {
+          // Transaction not yet mined, poll again after 2 seconds
+          console.log("⏳ Transaction not yet mined, polling again...");
+          setTimeout(checkTransaction, 2000);
+        }
+      } catch (error) {
+        console.error("❌ Error checking transaction:", error);
+        setIsConfirming(false);
+        setError(`Error checking transaction: ${error instanceof Error ? error.message : "Unknown error"}`);
+      }
+    };
+    
+    // Start checking after a short delay to allow transaction to be submitted
+    const timeoutId = setTimeout(checkTransaction, 2000);
+    
+    // Cleanup timeout on unmount
+    return () => clearTimeout(timeoutId);
+  }, [transactionHash]);
 
   const handleSend = async () => {
     console.log("🔵🔵🔵 handleSend called - NEW CODE VERSION 🔵🔵🔵");
