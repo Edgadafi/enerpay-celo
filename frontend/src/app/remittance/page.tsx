@@ -370,15 +370,32 @@ export default function RemittancePage() {
         try {
           console.log("🔍 Verifying contract exists at:", contractAddress);
           // Try to read a public variable to verify contract exists
-          await publicClient.readContract({
+          const remittanceCount = await publicClient.readContract({
             address: contractAddress,
             abi: ENERPAY_REMITTANCE_ABI,
             functionName: "remittanceCount",
           });
+          
+          // Also check treasury address
+          const treasuryAddress = await publicClient.readContract({
+            address: contractAddress,
+            abi: ENERPAY_REMITTANCE_ABI,
+            functionName: "treasuryAddress",
+          });
+          
           console.log("✅ Contract verified - exists at address");
+          console.log("📊 Contract info:", {
+            remittanceCount: remittanceCount.toString(),
+            treasuryAddress: treasuryAddress,
+          });
+          
+          // Verify treasury address is not zero
+          if (treasuryAddress === "0x0000000000000000000000000000000000000000") {
+            throw new Error("Treasury address is not set in the contract. Please contact the contract owner.");
+          }
         } catch (contractErr: any) {
           console.error("❌ Contract verification failed:", contractErr);
-          setError(`Contract not found at address ${contractAddress}. Please verify the contract is deployed.`);
+          setError(`Contract verification failed: ${contractErr.message || "Contract not found at address"}. Please verify the contract is deployed.`);
           setIsCheckingAllowance(false);
           return;
         }
