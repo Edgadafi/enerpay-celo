@@ -121,8 +121,13 @@ export default function SendPage() {
           if (isSuccessful) {
             console.log("✅✅✅ Transaction confirmed successfully!");
             const actualTxHash = receipt.transactionHash || transactionHash;
-            console.log("🔗 View transaction: https://explorer.celo.org/sepolia/tx/" + actualTxHash);
-            console.log("🔗 Alternative: https://sepolia.celoscan.io/tx/" + actualTxHash);
+            
+            // Use correct explorer URLs for Celo Sepolia
+            const explorerUrl = `https://sepolia.celoscan.io/tx/${actualTxHash}`;
+            const alternativeUrl = `https://explorer.celo.org/sepolia/tx/${actualTxHash}`;
+            
+            console.log("🔗 View transaction on CeloScan:", explorerUrl);
+            console.log("🔗 Alternative (Celo Explorer):", alternativeUrl);
             
             // Simplified verification: If receipt has status 0x1, transaction was successful
             // Additional verification can be done via explorer links
@@ -462,7 +467,8 @@ export default function SendPage() {
         
         console.log("✅✅✅ Transaction hash received:", hash);
         console.log("📋 Transaction hash:", hash);
-        console.log("🔗 View on explorer: https://explorer.celo.org/sepolia/tx/" + hash);
+        console.log("🔗 View on CeloScan: https://sepolia.celoscan.io/tx/" + hash);
+        console.log("🔗 Alternative: https://explorer.celo.org/sepolia/tx/" + hash);
         setTxHash(hash as `0x${string}`);
         setLastTransactionAmount(amountWei); // Store amount for verification
         setLastRecipient(recipient); // Store recipient for verification
@@ -570,14 +576,24 @@ export default function SendPage() {
                 {isConfirming ? "⏳ Transaction pending confirmation..." : "📋 Transaction submitted"}
               </div>
               <div className="text-xs font-mono break-all mb-2">{transactionHash}</div>
-              <a
-                href={`https://explorer.celo.org/sepolia/tx/${transactionHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-xs hover:text-blue-900"
-              >
-                View on Celo Explorer →
-              </a>
+              <div className="flex gap-2 flex-wrap">
+                <a
+                  href={`https://sepolia.celoscan.io/tx/${transactionHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-xs hover:text-blue-900"
+                >
+                  View on CeloScan →
+                </a>
+                <a
+                  href={`https://explorer.celo.org/sepolia/tx/${transactionHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-xs hover:text-blue-900"
+                >
+                  Celo Explorer →
+                </a>
+              </div>
             </div>
           )}
 
@@ -588,14 +604,24 @@ export default function SendPage() {
               {transactionHash && (
                 <div className="mt-2">
                   <div className="text-xs font-mono break-all mb-2">{transactionHash}</div>
-                  <a
-                    href={`https://explorer.celo.org/sepolia/tx/${transactionHash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline text-xs hover:text-green-900"
-                  >
-                    View transaction on Celo Explorer →
-                  </a>
+                  <div className="flex gap-2 flex-wrap">
+                    <a
+                      href={`https://sepolia.celoscan.io/tx/${transactionHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-xs hover:text-green-900"
+                    >
+                      View on CeloScan →
+                    </a>
+                    <a
+                      href={`https://explorer.celo.org/sepolia/tx/${transactionHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-xs hover:text-green-900"
+                    >
+                      Celo Explorer →
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
