@@ -36,13 +36,21 @@ export default function RemittancePage() {
   useEffect(() => {
     if (txError) {
       console.error("❌ Transaction error from useSendRemittance:", txError);
-      console.error("❌ Error details:", {
+      const errorDetails: any = {
         message: txError?.message,
         name: txError?.name,
-        cause: txError?.cause,
-        shortMessage: txError?.shortMessage,
-        data: txError?.data,
-      });
+      };
+      // Only access properties that might exist
+      if ('cause' in txError) {
+        errorDetails.cause = (txError as any).cause;
+      }
+      if ('data' in txError) {
+        errorDetails.data = (txError as any).data;
+      }
+      if ('shortMessage' in txError) {
+        errorDetails.shortMessage = (txError as any).shortMessage;
+      }
+      console.error("❌ Error details:", errorDetails);
     }
   }, [txError]);
 
@@ -566,7 +574,12 @@ export default function RemittancePage() {
           {(error || txError) && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm space-y-2">
               <div className="font-semibold">❌ Error</div>
-              <div>{error || txError?.message || txError?.shortMessage || "Transaction failed"}</div>
+              <div>
+                {error || 
+                 txError?.message || 
+                 ('shortMessage' in (txError || {}) ? (txError as any).shortMessage : null) ||
+                 "Transaction failed"}
+              </div>
               {txError && (
                 <details className="text-xs mt-2">
                   <summary className="cursor-pointer text-red-600 hover:text-red-800">
