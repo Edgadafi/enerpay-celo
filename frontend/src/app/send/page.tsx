@@ -120,39 +120,93 @@ export default function SendPage() {
           
           if (isSuccessful) {
             console.log("✅✅✅ Transaction confirmed successfully!");
+            const actualTxHash = receipt.transactionHash || transactionHash;
+            console.log("🔗 View transaction: https://explorer.celo.org/sepolia/tx/" + actualTxHash);
+            console.log("🔗 Alternative: https://sepolia.celoscan.io/tx/" + actualTxHash);
             
-            // Verify the transfer actually happened by checking the recipient's balance
-            // This ensures the transaction wasn't just confirmed but actually executed
+            // CRITICAL: Verify the transaction actually exists on-chain
             try {
-              console.log("🔍 Verifying token transfer by checking recipient balance...");
-              const recipientBalance = await window.ethereum.request({
-                method: "eth_call",
-                params: [
-                  {
-                    to: TOKENS.CUSD,
-                    data: `0x70a08231${recipient.slice(2).padStart(64, '0')}`, // balanceOf(recipient)
-                  },
-                  receipt.blockNumber, // Use the block number from receipt
-                ],
+              console.log("🔍 Verifying transaction exists on-chain...");
+              const txOnChain = await window.ethereum.request({
+                method: "eth_getTransactionByHash",
+                params: [actualTxHash],
               });
               
-              const balance = BigInt(recipientBalance as string);
-              console.log("📊 Recipient balance after transaction:", {
-                recipient: recipient,
-                balance: balance.toString(),
-                balanceFormatted: (Number(balance) / 1e18).toFixed(4),
-                expectedAmount: lastTransactionAmount?.toString() || "N/A",
+              if (!txOnChain) {
+                throw new Error("Transaction not found on-chain - this is a critical error!");
+              }
+              
+              console.log("✅ Transaction found on-chain:", {
+                hash: txOnChain.hash,
+                blockNumber: txOnChain.blockNumber,
+                from: txOnChain.from,
+                to: txOnChain.to,
               });
               
-              // Note: We can't easily verify the exact amount increased without knowing the previous balance
-              // But if we got a receipt with status 0x1, the transaction was successful
+              // Verify the transfer actually happened by checking the recipient's balance
+              if (lastRecipient && lastTransactionAmount) {
+                console.log("🔍 Verifying token transfer by checking recipient balance...");
+                // Get recipient address without 0x prefix and pad to 64 chars
+                const recipientAddress = lastRecipient.startsWith('0x') 
+                  ? lastRecipient.slice(2).padStart(64, '0')
+                  : lastRecipient.padStart(64, '0');
+                
+                const balanceOfData = `0x70a08231${recipientAddress}`; // balanceOf(address)
+                
+                // Get balance before transaction (from previous block)
+                const blockBefore = `0x${(BigInt(receipt.blockNumber) - 1n).toString(16)}`;
+                const balanceBefore = await window.ethereum.request({
+                  method: "eth_call",
+                  params: [
+                    {
+                      to: TOKENS.CUSD,
+                      data: balanceOfData,
+                    },
+                    blockBefore,
+                  ],
+                });
+                
+                // Get balance after transaction
+                const balanceAfter = await window.ethereum.request({
+                  method: "eth_call",
+                  params: [
+                    {
+                      to: TOKENS.CUSD,
+                      data: balanceOfData,
+                    },
+                    receipt.blockNumber,
+                  ],
+                });
+                
+                const balanceBeforeBig = BigInt(balanceBefore as string);
+                const balanceAfterBig = BigInt(balanceAfter as string);
+                const actualIncrease = balanceAfterBig - balanceBeforeBig;
+                
+                console.log("📊 Balance verification:", {
+                  recipient: lastRecipient,
+                  balanceBefore: balanceBeforeBig.toString(),
+                  balanceAfter: balanceAfterBig.toString(),
+                  actualIncrease: actualIncrease.toString(),
+                  expectedAmount: lastTransactionAmount.toString(),
+                  matches: actualIncrease === lastTransactionAmount,
+                });
+                
+                if (actualIncrease !== lastTransactionAmount) {
+                  console.warn("⚠️ Balance increase doesn't match expected amount!");
+                  console.warn("This might indicate the transaction didn't execute correctly.");
+                }
+              }
+              
+              // Transaction was confirmed with status 0x1 and exists on-chain
               setIsConfirming(false);
               setIsSuccess(true);
             } catch (verifyError) {
-              console.warn("⚠️ Could not verify recipient balance, but transaction was confirmed:", verifyError);
-              // Transaction was confirmed, so mark as success anyway
+              console.error("❌ Error verifying transaction:", verifyError);
+              // If verification fails, still mark as success if receipt says so
+              // But warn the user
               setIsConfirming(false);
               setIsSuccess(true);
+              setError("Transaction confirmed but verification failed. Please check the explorer manually.");
             }
           } else {
             setIsConfirming(false);
