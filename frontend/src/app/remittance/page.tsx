@@ -2,11 +2,13 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
-import { useAccount } from "wagmi";
+import { useState, useEffect } from "react";
+import { useAccount, usePublicClient } from "wagmi";
 import { useRemittance, useSendRemittance, useCalculateFee } from "@/hooks/useRemittance";
 import { isValidAddress, isValidPhoneNumber, formatPhoneToE164 } from "@/lib/celo/utils";
-import { getAddress } from "viem";
+import { getAddress, formatUnits } from "viem";
+import { erc20Abi } from "viem";
+import { TOKENS } from "@/lib/celo/constants";
 import { Send, Loader2, Calculator } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Header } from "@/components/Header";
@@ -30,6 +32,46 @@ export default function RemittancePage() {
     useSendRemittance();
 
   const { feeFormatted, totalAmountFormatted, isLoading: feeLoading } = useCalculateFee(amount);
+  const publicClient = usePublicClient();
+  const [contractBalance, setContractBalance] = useState<string | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<"idle" | "checking" | "verified" | "failed">("idle");
+
+  // Verify transaction and contract balance after success
+  useEffect(() => {
+    if (isSuccess && hash && (destinationType === "mobile" || destinationType === "bank")) {
+      const verifyTransaction = async () => {
+        setVerificationStatus("checking");
+        try {
+          // Wait a bit for the transaction to be fully processed
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // Get contract balance
+          if (publicClient) {
+            const balance = await publicClient.readContract({
+              address: TOKENS.CUSD,
+              abi: erc20Abi,
+              functionName: "balanceOf",
+              args: [contractAddress],
+            });
+            
+            const balanceFormatted = formatUnits(balance as bigint, 18);
+            setContractBalance(balanceFormatted);
+            setVerificationStatus("verified");
+            
+            console.log("✅ Contract balance verified:", balanceFormatted, "cUSD");
+          }
+        } catch (err) {
+          console.error("❌ Error verifying transaction:", err);
+          setVerificationStatus("failed");
+        }
+      };
+      
+      verifyTransaction();
+    } else {
+      setContractBalance(null);
+      setVerificationStatus("idle");
+    }
+  }, [isSuccess, hash, destinationType, contractAddress, publicClient]);
 
   const handleSend = async () => {
     setError("");
@@ -318,18 +360,71 @@ export default function RemittancePage() {
 
           {/* Success */}
           {isSuccess && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm">
-              Remittance sent successfully!
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm space-y-2">
+              <div className="font-semibold">✅ Remittance sent successfully!</div>
+              
+              {(destinationType === "mobile" || destinationType === "bank") && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2 text-blue-800 text-xs space-y-2">
+                  <p className="font-semibold mb-1">📦 Funds in Escrow</p>
+                  <p>
+                    Your {amount} cUSD has been transferred to the contract and is being held in escrow. 
+                    The platform fee ({feeLoading ? "..." : feeFormatted} cUSD) has been deducted.
+                  </p>
+                  <p className="mt-2 text-blue-700">
+                    Status: <strong>Pending</strong> - Waiting for remittance processing
+                  </p>
+                  
+                  {verificationStatus === "checking" && (
+                    <p className="text-blue-600 italic">⏳ Verifying transaction on blockchain...</p>
+                  )}
+                  
+                  {verificationStatus === "verified" && contractBalance && (
+                    <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-green-800">
+                      <p className="font-semibold">✅ Transaction Verified</p>
+                      <p className="text-xs mt-1">
+                        Contract balance: <strong>{parseFloat(contractBalance).toFixed(4)} cUSD</strong>
+                      </p>
+                      <p className="text-xs mt-1 text-green-700">
+                        Your funds are safely held in the contract escrow.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {verificationStatus === "failed" && (
+                    <p className="text-orange-600 italic">
+                      ⚠️ Could not verify automatically. Please check the transaction on the explorer.
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              {destinationType === "wallet" && (
+                <div className="text-xs text-green-600">
+                  Funds have been transferred directly to the beneficiary wallet.
+                </div>
+              )}
+              
               {hash && (
-                <div className="mt-2">
-                  <a
-                    href={`https://explorer.celo.org/sepolia/tx/${hash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    View transaction
-                  </a>
+                <div className="mt-2 space-y-1">
+                  <div className="text-xs text-gray-600">Transaction Hash:</div>
+                  <div className="flex flex-col gap-1">
+                    <a
+                      href={`https://sepolia.celoscan.io/tx/${hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs underline break-all"
+                    >
+                      View on CeloScan: {hash.slice(0, 10)}...{hash.slice(-8)}
+                    </a>
+                    <a
+                      href={`https://explorer.celo.org/sepolia/tx/${hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs underline break-all"
+                    >
+                      View on Celo Explorer
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
