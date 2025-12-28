@@ -431,6 +431,27 @@ export default function RemittancePage() {
         throw new Error(`Please switch to Celo Sepolia. Current chain: ${parseInt(currentChain as string, 16)}`);
       }
       
+      // Try to simulate the transaction first to get revert reason
+      if (publicClient) {
+        try {
+          console.log("🔍 Simulating transaction to check for errors...");
+          await publicClient.simulateContract({
+            address: contractAddress,
+            abi: ENERPAY_REMITTANCE_ABI,
+            functionName: "sendRemittance",
+            args: [finalBeneficiary, amountWei, destinationType, finalDestinationId],
+            account: address as `0x${string}`,
+          });
+          console.log("✅ Transaction simulation successful - no errors detected");
+        } catch (simErr: any) {
+          console.error("❌ Transaction simulation failed:", simErr);
+          const errorMessage = simErr?.shortMessage || simErr?.message || "Transaction would fail";
+          setError(`Transaction would fail: ${errorMessage}. Please check your balance and try again.`);
+          setIsCheckingAllowance(false);
+          return;
+        }
+      }
+      
       // Encode the function call
       const data = encodeFunctionData({
         abi: ENERPAY_REMITTANCE_ABI,
