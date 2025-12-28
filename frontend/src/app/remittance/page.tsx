@@ -9,6 +9,7 @@ import { isValidAddress, isValidPhoneNumber, formatPhoneToE164, parseCUSD } from
 import { getAddress, formatUnits, maxUint256 } from "viem";
 import { erc20Abi } from "viem";
 import { TOKENS, CELO_SEPOLIA_CHAIN_ID } from "@/lib/celo/constants";
+import { ENERPAY_REMITTANCE_ABI } from "@/lib/contracts/EnerpayRemittance.abi";
 import { Send, Loader2, Calculator } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Header } from "@/components/Header";
@@ -283,6 +284,25 @@ export default function RemittancePage() {
       }
       setIsCheckingAllowance(false);
       setNeedsApproval(false);
+      
+      // Verify contract exists by trying to read from it
+      if (publicClient) {
+        try {
+          console.log("🔍 Verifying contract exists at:", contractAddress);
+          // Try to read a public variable to verify contract exists
+          await publicClient.readContract({
+            address: contractAddress,
+            abi: ENERPAY_REMITTANCE_ABI,
+            functionName: "remittanceCount",
+          });
+          console.log("✅ Contract verified - exists at address");
+        } catch (contractErr: any) {
+          console.error("❌ Contract verification failed:", contractErr);
+          setError(`Contract not found at address ${contractAddress}. Please verify the contract is deployed.`);
+          setIsCheckingAllowance(false);
+          return;
+        }
+      }
       
       // For mobile/bank, use contract address as beneficiary (funds stay in contract as escrow)
       // In production, this would be resolved via an identity service
