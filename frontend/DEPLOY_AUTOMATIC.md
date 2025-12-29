@@ -65,7 +65,7 @@ Para que las variables de entorno estén disponibles en producción, configúral
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Tu Project ID de WalletConnect | Production, Preview, Development |
 | `NEXT_PUBLIC_APP_NAME` | `Enerpay` | Production, Preview, Development |
 | `NEXT_PUBLIC_CELO_RPC_URL` | `https://forno.celo-sepolia.celo-testnet.org` | Production, Preview, Development |
-| `NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS` | `0x733177De022870Eb7Cfd0B72fAC63F53a1F96f48` | Production, Preview, Development |
+| `NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS` | `0x8aB940E40F64306E1C6af7B80429B4D0Bd2C65eb` | Production, Preview, Development |
 
 5. Haz clic en **Save**
 6. **Importante**: Redespliega para aplicar los cambios:

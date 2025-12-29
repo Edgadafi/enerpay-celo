@@ -8,7 +8,7 @@ Las siguientes variables de entorno están configuradas en Vercel para todos los
 |----------|-------|-------------|
 | `NEXT_PUBLIC_APP_NAME` | `Enerpay` | Nombre de la aplicación |
 | `NEXT_PUBLIC_CELO_RPC_URL` | `https://forno.celo-sepolia.celo-testnet.org` | URL del RPC de Celo Sepolia Testnet |
-| `NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS` | `0x733177De022870Eb7Cfd0B72fAC63F53a1F96f48` | Dirección del contrato de remesas desplegado en Celo Sepolia |
+| `NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS` | `0x8aB940E40F64306E1C6af7B80429B4D0Bd2C65eb` | Dirección del contrato de remesas desplegado en Celo Sepolia (SafeERC20 version) |
 
 ## ⚠️ Variable Opcional (Recomendada)
 
@@ -88,9 +88,9 @@ vercel env pull .env.local
   - Alfajores: `https://alfajores-forno.celo-testnet.org`
 
 ### NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS
-- **Valor**: `0x733177De022870Eb7Cfd0B72fAC63F53a1F96f48`
-- **Uso**: Dirección del contrato inteligente `EnerpayRemittance` desplegado en Celo Sepolia
-- **Explorer**: [Ver en Celo Sepolia Explorer](https://explorer.celo.org/sepolia/address/0x733177De022870Eb7Cfd0B72fAC63F53a1F96f48)
+- **Valor**: `0x8aB940E40F64306E1C6af7B80429B4D0Bd2C65eb`
+- **Uso**: Dirección del contrato inteligente `EnerpayRemittance` desplegado en Celo Sepolia (SafeERC20 version)
+- **Explorer**: [Ver en Celo Sepolia Explorer](https://sepolia.celoscan.io/address/0x8aB940E40F64306E1C6af7B80429B4D0Bd2C65eb)
 
 ## 🛡️ Seguridad
 

@@ -23,7 +23,7 @@ Ninguna variable es estrictamente requerida, pero se recomienda configurar:
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | ID del proyecto WalletConnect para conexión de wallets | `a1b2c3d4e5f6...` (32 caracteres hex) | [cloud.walletconnect.com](https://cloud.walletconnect.com) |
 | `NEXT_PUBLIC_APP_NAME` | Nombre de la aplicación | `Enerpay` | - |
 | `NEXT_PUBLIC_CELO_RPC_URL` | URL del RPC de Celo (opcional, usa default si no se define) | `https://forno.celo.org` | - |
-| `NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS` | Dirección del contrato de remesas (opcional, usa default) | `0x733177De022870Eb7Cfd0B72fAC63F53a1F96f48` | Contrato desplegado |
+| `NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS` | Dirección del contrato de remesas (opcional, usa default) | `0x8aB940E40F64306E1C6af7B80429B4D0Bd2C65eb` | Contrato desplegado (SafeERC20 version) |
 
 ## ✅ Repositorio Ya Conectado
 
@@ -61,7 +61,7 @@ El repositorio ya está conectado. Puedes verificar en:
 2. Opcionalmente, agrega:
    ```
    NEXT_PUBLIC_CELO_RPC_URL=https://forno.celo.org
-   NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS=0x733177De022870Eb7Cfd0B72fAC63F53a1F96f48
+   NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS=0x8aB940E40F64306E1C6af7B80429B4D0Bd2C65eb
    ```
 
 ### Paso 4: Desplegar
