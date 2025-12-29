@@ -128,9 +128,14 @@ export default function RemittancePage() {
         const feeWei = parseCUSD(feeFormatted || "0");
         const totalAmountWei = amountWei + feeWei;
         
-        // Double-check allowance
+        // Double-check allowance (wait a bit more for transaction to be fully confirmed)
         if (publicClient && address) {
           console.log("🔍 Checking allowance after approval...");
+          console.log("📋 Contract address being checked:", contractAddress);
+          
+          // Wait a bit more to ensure the approval transaction is fully processed
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
           const currentAllowance = await publicClient.readContract({
             address: TOKENS.CUSD,
             abi: erc20Abi,
@@ -140,6 +145,9 @@ export default function RemittancePage() {
           
           console.log("🔍 Allowance after approval:", formatUnits(currentAllowance as bigint, 18), "cUSD");
           console.log("🔍 Total amount needed:", formatUnits(totalAmountWei, 18), "cUSD");
+          console.log("🔍 Allowance raw value:", currentAllowance.toString());
+          console.log("🔍 Total amount raw value:", totalAmountWei.toString());
+          console.log("🔍 Comparison:", currentAllowance >= totalAmountWei);
           
           if (currentAllowance >= totalAmountWei) {
             console.log("✅ Allowance sufficient, sending remittance...");
