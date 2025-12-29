@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -11,6 +12,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * @dev Allows users to send remittances with platform fees and tracking
  */
 contract EnerpayRemittance is ReentrancyGuard, Ownable {
+    using SafeERC20 for IERC20;
+    
     // ============ State Variables ============
     
     /// @notice cUSD token contract address
@@ -150,10 +153,7 @@ contract EnerpayRemittance is ReentrancyGuard, Ownable {
         uint256 totalAmount = _amount + fee;
         
         // Transfer cUSD from user to contract
-        require(
-            cUSD.transferFrom(msg.sender, address(this), totalAmount),
-            "Transfer failed"
-        );
+        cUSD.safeTransferFrom(msg.sender, address(this), totalAmount);
         
         // Create remittance record
         uint256 remittanceId = remittanceCount;
@@ -174,10 +174,7 @@ contract EnerpayRemittance is ReentrancyGuard, Ownable {
         
         // Transfer fee to treasury
         if (fee > 0) {
-            require(
-                cUSD.transfer(treasuryAddress, fee),
-                "Fee transfer failed"
-            );
+            cUSD.safeTransfer(treasuryAddress, fee);
         }
         
         // If wallet-to-wallet, transfer immediately
@@ -185,10 +182,7 @@ contract EnerpayRemittance is ReentrancyGuard, Ownable {
             keccak256(bytes(_destinationType)) ==
             keccak256(bytes("wallet"))
         ) {
-            require(
-                cUSD.transfer(_beneficiary, _amount),
-                "Beneficiary transfer failed"
-            );
+            cUSD.safeTransfer(_beneficiary, _amount);
             remittances[remittanceId].status = RemittanceStatus.Completed;
             
             emit RemittanceCompleted(
@@ -236,16 +230,10 @@ contract EnerpayRemittance is ReentrancyGuard, Ownable {
         
         if (_status == RemittanceStatus.Completed) {
             // Transfer amount to beneficiary
-            require(
-                cUSD.transfer(remittance.beneficiary, remittance.amount),
-                "Beneficiary transfer failed"
-            );
+            cUSD.safeTransfer(remittance.beneficiary, remittance.amount);
         } else if (_status == RemittanceStatus.Refunded) {
             // Refund amount to sender
-            require(
-                cUSD.transfer(remittance.sender, remittance.amount),
-                "Refund transfer failed"
-            );
+            cUSD.safeTransfer(remittance.sender, remittance.amount);
         }
         // If Failed, amount stays in contract (can be handled separately)
         
@@ -319,7 +307,7 @@ contract EnerpayRemittance is ReentrancyGuard, Ownable {
         address _to
     ) external onlyOwner {
         require(_to != address(0), "Invalid address");
-        require(cUSD.transfer(_to, _amount), "Transfer failed");
+        cUSD.safeTransfer(_to, _amount);
     }
 }
 
