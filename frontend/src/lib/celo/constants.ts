@@ -73,10 +73,10 @@ export const CONTRACTS = {
   // IMPORTANT: Using new contract address directly (SafeERC20 version)
   ENERPAY_REMITTANCE_SEPOLIA:
     "0x8aB940E40F64306E1C6af7B80429B4D0Bd2C65eb",
-  // MicrofinancePool deployed on Celo Sepolia (Updated with correct cUSD address)
+  // MicrofinancePool deployed on Celo Sepolia (Fixed: removed pool balance check from requestLoan)
   MICROFINANCE_POOL_SEPOLIA:
     process.env.NEXT_PUBLIC_MICROFINANCE_CONTRACT_ADDRESS ||
-    "0x86c3C8e2cf4F4E76850a276D9E94bb024B07F40B", // New deployment with correct cUSD address
+    "0x9D9Fd1bD3809a9cDCB2562cBa0d558e164299B7d", // Fixed: allows loan requests without pool funds
 } as const;
 
 // ERC20 ABI for token interactions

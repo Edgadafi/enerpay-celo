@@ -163,8 +163,9 @@ contract MicrofinancePool is ReentrancyGuard, Ownable {
         uint256 reputation = reputationScores[msg.sender];
         require(reputation >= minReputationScore, "Insufficient reputation");
         
-        // Check pool has enough funds
-        require(poolBalance >= _amount, "Insufficient pool funds");
+        // Note: Pool balance check is done in disburseLoan(), not here
+        // This allows users to request loans even if pool is temporarily empty
+        // The owner can add funds before approving/disbursing
         
         // Calculate interest rate based on reputation
         uint256 interestRate = calculateInterestRate(reputation, _amount);
