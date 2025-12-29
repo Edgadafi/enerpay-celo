@@ -69,10 +69,10 @@ export const EXPLORERS = {
 
 // Smart Contract Addresses
 export const CONTRACTS = {
-  // EnerpayRemittance deployed on Celo Sepolia
+  // EnerpayRemittance deployed on Celo Sepolia (Updated with SafeERC20)
   ENERPAY_REMITTANCE_SEPOLIA:
     process.env.NEXT_PUBLIC_REMITTANCE_CONTRACT_ADDRESS ||
-    "0x733177De022870Eb7Cfd0B72fAC63F53a1F96f48",
+    "0x8aB940E40F64306E1C6af7B80429B4D0Bd2C65eb",
   // MicrofinancePool deployed on Celo Sepolia
   MICROFINANCE_POOL_SEPOLIA:
     process.env.NEXT_PUBLIC_MICROFINANCE_CONTRACT_ADDRESS ||
