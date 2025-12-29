@@ -474,7 +474,18 @@ export default function RemittancePage() {
           console.log("📊 Simulation result:", result);
         } catch (simErr: any) {
           console.error("❌ Transaction simulation failed:", simErr);
-          console.error("❌ Full error details:", JSON.stringify(simErr, null, 2));
+          
+          // Helper function to safely stringify error (handles BigInt)
+          const safeStringify = (obj: any, space?: number): string => {
+            return JSON.stringify(obj, (key, value) => {
+              if (typeof value === 'bigint') {
+                return value.toString();
+              }
+              return value;
+            }, space);
+          };
+          
+          console.error("❌ Full error details:", safeStringify(simErr, 2));
           
           // Try to extract more specific error information
           let errorMessage = "Transaction would fail";
