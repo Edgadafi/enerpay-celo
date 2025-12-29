@@ -21,8 +21,23 @@ const DESTINATION_TYPES = [
 ];
 
 export default function RemittancePage() {
+  // Log component mount
+  useEffect(() => {
+    console.log("🟢 RemittancePage component mounted");
+    console.log("📋 Contract address from constants:", CONTRACTS.ENERPAY_REMITTANCE_SEPOLIA);
+  }, []);
+
   const { address, isConnected } = useAccount();
   const { isCeloSepolia, contractAddress } = useRemittance();
+  
+  // Log contract address from hook
+  useEffect(() => {
+    console.log("🔍 Contract address from hook:", contractAddress);
+    console.log("🔍 Is Celo Sepolia:", isCeloSepolia);
+    console.log("🔍 Wallet connected:", isConnected);
+    console.log("🔍 Wallet address:", address);
+  }, [contractAddress, isCeloSepolia, isConnected, address]);
+
   const [beneficiary, setBeneficiary] = useState("");
   const [amount, setAmount] = useState("");
   const [destinationType, setDestinationType] = useState("mobile"); // Default to mobile for better UX
