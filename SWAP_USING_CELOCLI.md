@@ -50,8 +50,10 @@ celocli account:new
 ## 📋 Paso 4: Verificar tu Balance
 
 ```bash
-celocli account:balance --address 0xfCb8226A19ee56EBC79127CC4662a8F1a85D2d77
+celocli account:balance 0xfCb8226A19ee56EBC79127CC4662a8F1a85D2d77 --node https://forno.celo-sepolia.celo-testnet.org/
 ```
+
+**Nota**: La dirección va como argumento posicional, no como flag.
 
 Deberías ver:
 - CELO: ~8.04
@@ -105,7 +107,7 @@ celocli exchange:celo \
 Después de la transacción:
 
 ```bash
-celocli account:balance --address 0xfCb8226A19ee56EBC79127CC4662a8F1a85D2d77
+celocli account:balance 0xfCb8226A19ee56EBC79127CC4662a8F1a85D2d77 --node https://forno.celo-sepolia.celo-testnet.org/
 ```
 
 Deberías ver tu nuevo balance de cUSD.
