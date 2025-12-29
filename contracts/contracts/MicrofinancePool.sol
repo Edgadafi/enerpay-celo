@@ -442,6 +442,16 @@ contract MicrofinancePool is ReentrancyGuard, Ownable {
     }
     
     /**
+     * @notice Add liquidity to the pool (only owner)
+     * @param _amount Amount of cUSD to add
+     */
+    function addLiquidity(uint256 _amount) external onlyOwner {
+        require(_amount > 0, "Amount must be greater than 0");
+        require(cUSD.transferFrom(msg.sender, address(this), _amount), "Transfer failed");
+        poolBalance += _amount;
+    }
+    
+    /**
      * @notice Emergency withdraw (only owner)
      * @param _amount Amount to withdraw
      */
