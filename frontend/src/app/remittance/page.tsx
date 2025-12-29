@@ -8,7 +8,7 @@ import { useRemittance, useCalculateFee } from "@/hooks/useRemittance";
 import { isValidAddress, isValidPhoneNumber, formatPhoneToE164, parseCUSD } from "@/lib/celo/utils";
 import { getAddress, formatUnits, maxUint256, encodeFunctionData } from "viem";
 import { erc20Abi } from "viem";
-import { TOKENS, CELO_SEPOLIA_CHAIN_ID } from "@/lib/celo/constants";
+import { TOKENS, CELO_SEPOLIA_CHAIN_ID, CONTRACTS } from "@/lib/celo/constants";
 import { ENERPAY_REMITTANCE_ABI } from "@/lib/contracts/EnerpayRemittance.abi";
 import { Send, Loader2, Calculator } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
