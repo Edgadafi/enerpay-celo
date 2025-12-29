@@ -174,6 +174,9 @@ contract EnerpayRemittance is ReentrancyGuard, Ownable {
         
         // Transfer fee to treasury
         if (fee > 0) {
+            // Verify contract has sufficient balance before transferring fee
+            uint256 contractBalance = cUSD.balanceOf(address(this));
+            require(contractBalance >= fee, "Insufficient contract balance for fee transfer");
             cUSD.safeTransfer(treasuryAddress, fee);
         }
         
