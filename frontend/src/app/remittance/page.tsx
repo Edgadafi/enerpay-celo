@@ -450,8 +450,8 @@ export default function RemittancePage() {
         method: "eth_chainId",
       });
       
-      if (parseInt(currentChain as string, 16) !== CELO_SEPOLIA_CHAIN_ID) {
-        throw new Error(`Please switch to Celo Sepolia. Current chain: ${parseInt(currentChain as string, 16)}`);
+      if (parseInt(currentChain as string, 16) !== CELO_MAINNET_CHAIN_ID) {
+        throw new Error(`Please switch to Celo Mainnet. Current chain: ${parseInt(currentChain as string, 16)}`);
       }
       
       // Check contract's cUSD balance before simulating
