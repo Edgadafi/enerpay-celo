@@ -98,6 +98,7 @@ export default function RemittancePage() {
           });
 
           if (isSuccessful) {
+            console.log("✅ Setting manualApprovalConfirmed to true");
             setManualApprovalConfirmed(true);
             clearInterval(pollInterval);
           }
