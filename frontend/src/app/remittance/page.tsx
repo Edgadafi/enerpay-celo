@@ -779,10 +779,10 @@ export default function RemittancePage() {
           {/* Send Button */}
           <button
             onClick={handleSend}
-            disabled={isPending || isConfirming || isCheckingAllowance || isApproving || isApprovingConfirming}
+            disabled={isPending || isConfirming || isCheckingAllowance || (isApproving || isApprovingConfirming) && !isSuccess}
             className="w-full bg-celo-green text-white py-4 px-6 rounded-xl font-semibold shadow-md hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {(isPending || isConfirming || isCheckingAllowance || isApproving || isApprovingConfirming) ? (
+            {!isSuccess && (isPending || isConfirming || isCheckingAllowance || isApproving || isApprovingConfirming) ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
                 <span>
