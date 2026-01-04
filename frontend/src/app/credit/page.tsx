@@ -42,7 +42,7 @@ export default function CreditPage() {
 
     // Validation
     if (!isCeloMainnet) {
-      setError("Please switch to Celo Sepolia network");
+      setError("Please switch to Celo Mainnet network");
       return;
     }
 
@@ -112,13 +112,13 @@ export default function CreditPage() {
     );
   }
 
-  if (!isCeloSepolia) {
+  if (!isCeloMainnet) {
     return (
       <div className="min-h-screen p-4 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Switch to Celo Sepolia</h2>
+          <h2 className="text-2xl font-bold mb-4">Switch to Celo Mainnet</h2>
           <p className="text-gray-600 mb-6">
-            Please switch to Celo Sepolia Testnet to use credit services
+            Please switch to Celo Mainnet to use credit services
           </p>
           <button
             onClick={switchToCeloMainnet}

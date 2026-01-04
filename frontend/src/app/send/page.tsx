@@ -65,7 +65,7 @@ export default function SendPage() {
       cusdAddress,
       isCeloMainnet,
     });
-  }, [isConnected, walletChainId, chain?.id, currentChainId, cusdAddress, isCeloSepolia]);
+  }, [isConnected, walletChainId, chain?.id, currentChainId, cusdAddress, isCeloMainnet]);
 
   // REMOVED useWriteContract - we're using window.ethereum.request directly
   // This was causing the chain mismatch error
