@@ -64,6 +64,61 @@ export default function RemittancePage() {
     },
   });
 
+  // Manual polling fallback for approval transaction
+  const [manualApprovalConfirmed, setManualApprovalConfirmed] = useState(false);
+  
+  useEffect(() => {
+    if (!approveHash || manualApprovalConfirmed || isApprovalSuccess) {
+      return;
+    }
+
+    // If useWaitForTransactionReceipt is not detecting the transaction after 10 seconds,
+    // use manual polling as fallback
+    const pollInterval = setInterval(async () => {
+      try {
+        if (typeof window === "undefined" || !window.ethereum) {
+          return;
+        }
+
+        console.log("🔍 Manual polling for approval transaction:", approveHash);
+        const receipt = await window.ethereum.request({
+          method: "eth_getTransactionReceipt",
+          params: [approveHash],
+        });
+
+        if (receipt) {
+          const status = receipt.status;
+          const isSuccessful = status === "0x1" || status === 1;
+          
+          console.log("✅ Manual polling found approval receipt:", {
+            hash: approveHash,
+            status,
+            isSuccessful,
+            blockNumber: receipt.blockNumber,
+          });
+
+          if (isSuccessful) {
+            setManualApprovalConfirmed(true);
+            clearInterval(pollInterval);
+          }
+        }
+      } catch (err) {
+        console.error("❌ Error in manual polling:", err);
+      }
+    }, 2000); // Poll every 2 seconds
+
+    // Clear interval after 60 seconds (30 attempts)
+    const timeout = setTimeout(() => {
+      clearInterval(pollInterval);
+      console.warn("⏰ Manual polling timeout for approval transaction");
+    }, 60000);
+
+    return () => {
+      clearInterval(pollInterval);
+      clearTimeout(timeout);
+    };
+  }, [approveHash, manualApprovalConfirmed, isApprovalSuccess]);
+
   // Log approval state for debugging
   console.log("🔐 Approval state:", {
     approveHash,
@@ -71,9 +126,13 @@ export default function RemittancePage() {
     isApproving,
     isApprovingConfirming,
     isApprovalSuccess,
+    manualApprovalConfirmed,
     approveError,
     approveConfirmError,
   });
+
+  // Use manual confirmation as fallback
+  const approvalConfirmed = isApprovalSuccess || manualApprovalConfirmed;
   
   const [contractBalance, setContractBalance] = useState<string | null>(null);
   const [verificationStatus, setVerificationStatus] = useState<"idle" | "checking" | "verified" | "failed">("idle");
@@ -299,7 +358,7 @@ export default function RemittancePage() {
       return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [needsApproval, approveHash, isApproving, isApprovingConfirming, isApprovalSuccess]);
+  }, [needsApproval, approveHash, isApproving, isApprovingConfirming, isApprovalSuccess, manualApprovalConfirmed]);
 
   const handleSend = async () => {
     setError("");
