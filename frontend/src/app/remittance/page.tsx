@@ -198,7 +198,7 @@ export default function RemittancePage() {
               });
               
               if (parseInt(currentChain as string, 16) !== CELO_MAINNET_CHAIN_ID) {
-                throw new Error(`Please switch to Celo Sepolia. Current chain: ${parseInt(currentChain as string, 16)}`);
+                throw new Error(`Please switch to Celo Mainnet. Current chain: ${parseInt(currentChain as string, 16)}`);
               }
               
               // Encode function call
