@@ -177,6 +177,15 @@ export default function RemittancePage() {
 
   // After approval completes, automatically send remittance
   useEffect(() => {
+    console.log("🔄 useEffect sendAfterApproval triggered:", {
+      needsApproval,
+      approveHash,
+      isApproving,
+      isApprovingConfirming,
+      isApprovalSuccess,
+      manualApprovalConfirmed,
+    });
+    
     const sendAfterApproval = async () => {
       if (!needsApproval || !approveHash) {
         console.log("⏸️ Skipping - needsApproval:", needsApproval, "approveHash:", approveHash);
@@ -185,6 +194,14 @@ export default function RemittancePage() {
       
       // Use manual confirmation as fallback
       const approvalConfirmed = isApprovalSuccess || manualApprovalConfirmed;
+      
+      console.log("🔍 sendAfterApproval check:", {
+        approvalConfirmed,
+        isApprovalSuccess,
+        manualApprovalConfirmed,
+        isApproving,
+        isApprovingConfirming,
+      });
       
       // Wait for approval to be confirmed (but skip if manual confirmation is already true)
       if (!approvalConfirmed && (isApproving || isApprovingConfirming)) {
