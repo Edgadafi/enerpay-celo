@@ -185,8 +185,8 @@ export default function RemittancePage() {
       // Use manual confirmation as fallback
       const approvalConfirmed = isApprovalSuccess || manualApprovalConfirmed;
       
-      // Wait for approval to be confirmed
-      if (isApproving || isApprovingConfirming) {
+      // Wait for approval to be confirmed (but skip if manual confirmation is already true)
+      if (!approvalConfirmed && (isApproving || isApprovingConfirming)) {
         console.log("⏳ Still waiting for approval confirmation...", {
           isApproving,
           isApprovingConfirming,
