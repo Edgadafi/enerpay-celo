@@ -370,44 +370,6 @@ export default function RemittancePage() {
       });
       
       return; // Wait for approval to complete
-      
-      // Verify contract exists by trying to read from it
-      if (publicClient) {
-        try {
-          console.log("🔍 Verifying contract exists at:", contractAddress);
-          // Try to read a public variable to verify contract exists
-          const remittanceCount = await publicClient.readContract({
-            address: contractAddress,
-            abi: ENERPAY_REMITTANCE_ABI,
-            functionName: "remittanceCount",
-          });
-          
-          // Also check treasury address
-          const treasuryAddress = await publicClient.readContract({
-            address: contractAddress,
-            abi: ENERPAY_REMITTANCE_ABI,
-            functionName: "treasuryAddress",
-          });
-          
-          console.log("✅ Contract verified - exists at address");
-          console.log("📊 Contract info:", {
-            remittanceCount: remittanceCount.toString(),
-            treasuryAddress: treasuryAddress,
-          });
-          
-          // Verify treasury address is not zero
-          if (treasuryAddress === "0x0000000000000000000000000000000000000000") {
-            throw new Error("Treasury address is not set in the contract. Please contact the contract owner.");
-          }
-        } catch (contractErr: any) {
-          console.error("❌ Contract verification failed:", contractErr);
-          setError(`Contract verification failed: ${contractErr.message || "Contract not found at address"}. Please verify the contract is deployed.`);
-          setIsCheckingAllowance(false);
-          return;
-        }
-      }
-      
-      // For mobile/bank, use contract address as beneficiary (funds stay in contract as escrow)
       // In production, this would be resolved via an identity service
       let finalBeneficiary: `0x${string}`;
       
