@@ -241,48 +241,30 @@ export default function RemittancePage() {
         const feeWei = parseCUSD(feeFormatted || "0");
         const totalAmountWei = amountWei + feeWei;
         
-        // Double-check allowance (wait a bit more for transaction to be fully confirmed)
-        if (publicClient && address) {
-          console.log("🔍 Checking allowance after approval...");
-          console.log("📋 Contract address being checked:", contractAddress);
-          
-          // Wait a bit more to ensure the approval transaction is fully processed
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-          const currentAllowance = await publicClient.readContract({
-            address: TOKENS.CUSD,
-            abi: erc20Abi,
-            functionName: "allowance",
-            args: [address, contractAddress],
-          });
-          
-          console.log("🔍 Allowance after approval:", formatUnits(currentAllowance as bigint, 18), "cUSD");
-          console.log("🔍 Total amount needed:", formatUnits(totalAmountWei, 18), "cUSD");
-          console.log("🔍 Allowance raw value:", currentAllowance.toString());
-          console.log("🔍 Total amount raw value:", totalAmountWei.toString());
-          console.log("🔍 Comparison:", currentAllowance >= totalAmountWei);
-          
-          if (currentAllowance >= totalAmountWei) {
-            console.log("✅ Allowance sufficient, sending remittance...");
-            setNeedsApproval(false);
-            
-            let finalBeneficiary: `0x${string}`;
-            if (destinationType === "wallet") {
-              finalBeneficiary = getAddress(beneficiary.trim());
-            } else {
-              finalBeneficiary = getAddress(contractAddress.trim());
-            }
-            
-            console.log("📤 Calling sendRemittance with:", {
-              finalBeneficiary,
-              amount,
-              destinationType,
-              destinationId,
-            });
-            
-            // After approval, send the remittance using window.ethereum.request directly
-            console.log("✅ Approval complete, sending remittance...");
-            setNeedsApproval(false);
+        // Since approval was successful, we can trust it exists
+        // Skip allowance check to avoid RPC issues (same problem as before)
+        console.log("✅ Approval confirmed, proceeding to send remittance (skipping allowance check)");
+        setNeedsApproval(false);
+        
+        // Wait a bit to ensure the approval transaction is fully processed
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        let finalBeneficiary: `0x${string}`;
+        if (destinationType === "wallet") {
+          finalBeneficiary = getAddress(beneficiary.trim());
+        } else {
+          finalBeneficiary = getAddress(contractAddress.trim());
+        }
+        
+        console.log("📤 Calling sendRemittance with:", {
+          finalBeneficiary,
+          amount,
+          destinationType,
+          destinationId,
+        });
+        
+        // After approval, send the remittance using window.ethereum.request directly
+        console.log("✅ Approval complete, sending remittance...");
             
             // Send remittance using window.ethereum.request (same as handleSend but without approval check)
             try {
