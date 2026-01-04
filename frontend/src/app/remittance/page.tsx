@@ -355,56 +355,21 @@ export default function RemittancePage() {
       const feeWei = parseCUSD(feeFormatted || "0");
       const totalAmountWei = amountWei + feeWei;
       
-      // Check allowance before sending
-      setIsCheckingAllowance(true);
-      if (publicClient && address) {
-        try {
-          const currentAllowance = await publicClient.readContract({
-            address: TOKENS.CUSD,
-            abi: erc20Abi,
-            functionName: "allowance",
-            args: [address, contractAddress],
-          });
-          
-          console.log("🔍 Current allowance:", formatUnits(currentAllowance as bigint, 18), "cUSD");
-          console.log("🔍 Total amount needed:", formatUnits(totalAmountWei, 18), "cUSD");
-          
-          if (currentAllowance < totalAmountWei) {
-            console.log("⚠️ Insufficient allowance, requesting approval...");
-            setNeedsApproval(true);
-            setIsCheckingAllowance(false);
-            
-            // Request approval
-            writeApprove({
-              address: TOKENS.CUSD,
-              abi: erc20Abi,
-              functionName: "approve",
-              args: [contractAddress, maxUint256], // Approve max for convenience
-              chainId: CELO_MAINNET_CHAIN_ID,
-            });
-            
-            return; // Wait for approval to complete
-          }
-        } catch (allowanceError: any) {
-          console.error("❌ Error checking allowance:", allowanceError);
-          // If allowance check fails, assume allowance is 0 and request approval
-          console.log("⚠️ Allowance check failed, requesting approval anyway...");
-          setNeedsApproval(true);
-          setIsCheckingAllowance(false);
-          
-          writeApprove({
-            address: TOKENS.CUSD,
-            abi: erc20Abi,
-            functionName: "approve",
-            args: [contractAddress, maxUint256],
-            chainId: CELO_MAINNET_CHAIN_ID,
-          });
-          
-          return;
-        }
-      }
+      // Always request approval first (simpler and more reliable)
+      // Skip allowance check to avoid RPC issues
+      console.log("📝 Requesting approval for cUSD...");
       setIsCheckingAllowance(false);
-      setNeedsApproval(false);
+      setNeedsApproval(true);
+      
+      writeApprove({
+        address: TOKENS.CUSD,
+        abi: erc20Abi,
+        functionName: "approve",
+        args: [contractAddress, maxUint256], // Approve max for convenience
+        chainId: CELO_MAINNET_CHAIN_ID,
+      });
+      
+      return; // Wait for approval to complete
       
       // Verify contract exists by trying to read from it
       if (publicClient) {
