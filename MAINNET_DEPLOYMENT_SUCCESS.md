@@ -47,18 +47,37 @@
 
 ## 🔍 Verificación de Contratos
 
-Para verificar los contratos en Celoscan, ejecuta:
+### ✅ EnerpayRemittance - VERIFICADO
+- **Estado:** ✅ Verificado en Celoscan
+- **Método:** Standard JSON Input
+- **Fecha:** 4 de Enero, 2026
+- **Celoscan:** https://celoscan.io/address/0xB35aB84408E28D0B81205293Dd2ed1d6E8566f1e
 
-### EnerpayRemittance:
+### ⏳ MicrofinancePool - Pendiente
+Para verificar MicrofinancePool en Celoscan, usa el mismo método (Standard JSON Input):
+
+**Constructor Arguments:**
+```
+000000000000000000000000765de816845861e75a25fca122bb6898b8b1282a000000000000000000000000856ff827a04ee1de5576e3d21e1985bd76fb24e7
+```
+
+**Pasos:**
+1. Ve a: https://celoscan.io/address/0xc19C1A8bb735288e753fD737aF88bf559063D617
+2. Contract → Verify and Publish
+3. Compiler Type: `Solidity (Standard JSON Input)`
+4. Sube el archivo `standard-json-input.json` (regenerar para MicrofinancePool)
+5. Constructor Arguments: (ver arriba)
+
+**O usar comando Hardhat (puede fallar por API V1):**
 ```bash
 cd contracts
 npx hardhat verify --network celo \
-  0xB35aB84408E28D0B81205293Dd2ed1d6E8566f1e \
+  0xc19C1A8bb735288e753fD737aF88bf559063D617 \
   0x765DE816845861e75A25fCA122bb6898B8B1282a \
   0x856Ff827A04Ee1dE5576e3d21e1985BD76fB24E7
 ```
 
-### MicrofinancePool:
+### MicrofinancePool (método anterior):
 ```bash
 cd contracts
 npx hardhat verify --network celo \
@@ -114,7 +133,8 @@ Realiza pruebas con montos pequeños:
 - [x] EnerpayRemittance desplegado
 - [x] MicrofinancePool desplegado
 - [x] Frontend actualizado
-- [ ] Contratos verificados en Celoscan (opcional)
+- [x] EnerpayRemittance verificado en Celoscan ✅
+- [ ] MicrofinancePool verificado en Celoscan (opcional)
 - [ ] Variables de entorno actualizadas en Vercel
 - [ ] Testing inicial completado
 - [ ] Monitoreo configurado

@@ -144,6 +144,9 @@ export default function RemittancePage() {
       console.log("✅ Remittance sent successfully, cleaning up approval state");
       setNeedsApproval(false);
       setManualApprovalConfirmed(false);
+      // Reset approval hash to stop useWaitForTransactionReceipt from continuing
+      // Note: We can't directly reset approveHash from useWriteContract, but
+      // we handle this in the button logic by checking isSuccess
     }
   }, [isSuccess]);
 
@@ -742,7 +745,7 @@ export default function RemittancePage() {
                   <div className="text-xs text-gray-600">Transaction Hash:</div>
                   <div className="flex flex-col gap-1">
                     <a
-                      href={`https://sepolia.celoscan.io/tx/${txHash}`}
+                      href={`https://celoscan.io/tx/${txHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs underline break-all"
@@ -750,7 +753,7 @@ export default function RemittancePage() {
                       View on CeloScan: {txHash.slice(0, 10)}...{txHash.slice(-8)}
                     </a>
                     <a
-                      href={`https://explorer.celo.org/sepolia/tx/${txHash}`}
+                      href={`https://explorer.celo.org/tx/${txHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs underline break-all"
@@ -770,7 +773,7 @@ export default function RemittancePage() {
               <p className="text-xs mt-1">
                 Please approve the contract to spend your cUSD. This is a one-time action per wallet.
               </p>
-              {(isApproving || isApprovingConfirming) && (
+              {(isApproving || isApprovingConfirming) && !isSuccess && (
                 <p className="text-xs mt-2 italic">⏳ Waiting for approval confirmation...</p>
               )}
             </div>

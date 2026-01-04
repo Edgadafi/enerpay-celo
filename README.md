@@ -202,6 +202,8 @@ npx hardhat run scripts/deploy.js --network alfajores
 - **Multi-sig support** - For cooperatives
 - **Smart contract audits** - Before mainnet
 
+> 📖 **Ver [SECURITY_CHECKLIST.md](./SECURITY_CHECKLIST.md) para el checklist completo de seguridad**
+
 ---
 
 ## 🛣️ Roadmap
@@ -227,6 +229,8 @@ npx hardhat run scripts/deploy.js --network alfajores
 - [ ] Partnerships with cooperatives
 - [ ] User acquisition
 - [ ] Marketing campaign
+
+> 📖 **Ver [MAINNET_DEPLOYMENT.md](./MAINNET_DEPLOYMENT.md) para el plan completo de despliegue a mainnet**
 
 ---
 
