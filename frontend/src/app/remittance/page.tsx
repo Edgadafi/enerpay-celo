@@ -359,6 +359,19 @@ export default function RemittancePage() {
     
     // Only run if we're waiting for approval and have an approval hash (check both confirmation sources)
     const approvalConfirmed = isApprovalSuccess || manualApprovalConfirmed;
+    
+    // If manual approval is confirmed, proceed immediately (don't wait for isApprovingConfirming)
+    if (manualApprovalConfirmed && needsApproval && approveHash && !isApproving) {
+      console.log("✅ Manual approval confirmed, executing sendAfterApproval immediately");
+      // Small delay to ensure everything is ready
+      const timer = setTimeout(() => {
+        sendAfterApproval();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+    
+    // Otherwise, wait for normal approval flow
     if (needsApproval && approveHash && !isApproving && !isApprovingConfirming && approvalConfirmed) {
       // Small delay to ensure everything is ready
       const timer = setTimeout(() => {
