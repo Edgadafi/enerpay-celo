@@ -59,22 +59,25 @@ export function useCelo() {
     args: address ? [address] : undefined,
     chainId: CELO_MAINNET_CHAIN_ID,
     query: {
-      enabled: !!address && isCeloMainnet,
+      enabled: !!address && isCeloMainnet && isConnected,
       refetchInterval: 5000, // Refetch every 5 seconds to keep balance updated
+      onError: (err) => console.error("❌ Error fetching cUSD balance:", err),
+      onSuccess: (data) => console.log("✅ cUSD balance fetched successfully:", data?.toString()),
     },
   });
 
   // Log balance for debugging
-  if (address && isCeloMainnet) {
-    console.log("💰 Balance check:", {
-      address,
-      isCeloMainnet,
-      cusdBalance,
-      cusdBalanceError,
-      isCUSDBalanceLoading,
-      formatted: cusdBalance ? formatCUSD(cusdBalance as bigint) : "0",
-    });
-  }
+  console.log("💰 Balance check:", {
+    address,
+    isConnected,
+    isCeloMainnet,
+    chainId,
+    cusdTokenAddress: TOKENS.CUSD,
+    cusdBalance: cusdBalance?.toString(),
+    isCUSDBalanceLoading,
+    cusdBalanceError,
+    enabled: !!address && isCeloMainnet && isConnected,
+  });
 
   return {
     address,
