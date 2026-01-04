@@ -370,6 +370,12 @@ export default function RemittancePage() {
       });
       
       return; // Wait for approval to complete - sendAfterApproval will handle the rest
+    } catch (err) {
+      console.error("❌ Error in handleSend:", err);
+      setIsCheckingAllowance(false);
+      const errorMessage = err instanceof Error ? err.message : "Transaction failed";
+      setError(errorMessage);
+    }
   };
 
   if (!isConnected) {
