@@ -377,6 +377,18 @@ export default function RemittancePage() {
     // Only run if we're waiting for approval and have an approval hash (check both confirmation sources)
     const approvalConfirmed = isApprovalSuccess || manualApprovalConfirmed;
     
+    console.log("🔍 useEffect condition check:", {
+      manualApprovalConfirmed,
+      needsApproval,
+      approveHash,
+      isApproving,
+      isApprovingConfirming,
+      isApprovalSuccess,
+      approvalConfirmed,
+      "condition1 (manual)": manualApprovalConfirmed && needsApproval && approveHash && !isApproving,
+      "condition2 (normal)": needsApproval && approveHash && !isApproving && !isApprovingConfirming && approvalConfirmed,
+    });
+    
     // If manual approval is confirmed, proceed immediately (don't wait for isApprovingConfirming)
     if (manualApprovalConfirmed && needsApproval && approveHash && !isApproving) {
       console.log("✅ Manual approval confirmed, executing sendAfterApproval immediately");
@@ -390,6 +402,7 @@ export default function RemittancePage() {
     
     // Otherwise, wait for normal approval flow
     if (needsApproval && approveHash && !isApproving && !isApprovingConfirming && approvalConfirmed) {
+      console.log("✅ Normal approval flow, executing sendAfterApproval");
       // Small delay to ensure everything is ready
       const timer = setTimeout(() => {
         sendAfterApproval();
@@ -397,6 +410,8 @@ export default function RemittancePage() {
       
       return () => clearTimeout(timer);
     }
+    
+    console.log("⏸️ useEffect conditions not met, not executing sendAfterApproval");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [needsApproval, approveHash, isApproving, isApprovingConfirming, isApprovalSuccess, manualApprovalConfirmed]);
 
