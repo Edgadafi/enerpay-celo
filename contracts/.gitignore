@@ -9,6 +9,8 @@ deployments/
 # Environment variables
 .env
 .env.local
+.env.mainnet
+.env.*
 
 # Node modules
 node_modules/

@@ -69,14 +69,18 @@ export const EXPLORERS = {
 
 // Smart Contract Addresses
 export const CONTRACTS = {
-  // EnerpayRemittance deployed on Celo Sepolia (Updated with SafeERC20)
-  // IMPORTANT: Using new contract address directly (SafeERC20 version)
+  // Celo Mainnet - Production contracts
+  ENERPAY_REMITTANCE_MAINNET:
+    "0xB35aB84408E28D0B81205293Dd2ed1d6E8566f1e",
+  MICROFINANCE_POOL_MAINNET:
+    "0xc19C1A8bb735288e753fD737aF88bf559063D617",
+  
+  // Celo Sepolia Testnet - Development contracts
   ENERPAY_REMITTANCE_SEPOLIA:
     "0x8aB940E40F64306E1C6af7B80429B4D0Bd2C65eb",
-  // MicrofinancePool deployed on Celo Sepolia (With addLiquidity function)
   MICROFINANCE_POOL_SEPOLIA:
     process.env.NEXT_PUBLIC_MICROFINANCE_CONTRACT_ADDRESS ||
-    "0xBdE9D212211bD74802df1e030B652bfb8B31f11D", // New contract with addLiquidity() function
+    "0xBdE9D212211bD74802df1e030B652bfb8B31f11D",
 } as const;
 
 // ERC20 ABI for token interactions

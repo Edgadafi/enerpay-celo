@@ -1,5 +1,9 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
+// Load .env.mainnet if deploying to celo mainnet
+if (process.argv.includes("--network") && process.argv[process.argv.indexOf("--network") + 1] === "celo") {
+  require("dotenv").config({ path: ".env.mainnet", override: true });
+}
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {

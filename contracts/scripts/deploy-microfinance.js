@@ -1,4 +1,9 @@
 require("dotenv").config();
+// Load .env.mainnet if deploying to celo mainnet
+const network = process.argv.includes("--network") && process.argv[process.argv.indexOf("--network") + 1];
+if (network === "celo") {
+  require("dotenv").config({ path: ".env.mainnet", override: true });
+}
 const hre = require("hardhat");
 const fs = require("fs");
 const path = require("path");
