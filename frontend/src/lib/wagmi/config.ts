@@ -74,15 +74,14 @@ if (!isValidProjectId) {
 // Wagmi configuration with Celo support
 // Note: projectId is required for WalletConnect, but we can work without it for local development
 // For production, you MUST set a valid projectId in .env.local
-// TEMPORARY FIX: Use only Celo Sepolia for testing to avoid chain resolution issues
-// TODO: Re-enable all chains once the chain mismatch issue is resolved
+// PRODUCTION: Using Celo Mainnet for production deployment
 export const config = getDefaultConfig({
   appName: process.env.NEXT_PUBLIC_APP_NAME || "Enerpay",
   projectId: isValidProjectId ? projectId : "00000000000000000000000000000000", // Required by getDefaultConfig
-  chains: [celoSepolia], // ONLY Celo Sepolia for now to fix chain mismatch
+  chains: [celoMainnet], // Celo Mainnet for production
   ssr: true, // Enable SSR support
   transports: {
-    [celoSepolia.id]: http(),
+    [celoMainnet.id]: http(),
   },
 });
 

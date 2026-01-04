@@ -11,19 +11,19 @@ import { QuickActions } from "@/components/wallet/QuickActions";
 import { Logo } from "@/components/Logo";
 
 export default function Home() {
-  const { isConnected, isCeloSepolia, switchToCeloSepolia, cusdBalanceFormatted } = useCelo();
+  const { isConnected, isCeloMainnet, switchToCeloMainnet, cusdBalanceFormatted } = useCelo();
 
-  // Show switch network prompt if not on Celo Sepolia (testnet)
-  if (isConnected && !isCeloSepolia) {
+  // Show switch network prompt if not on Celo Mainnet (production)
+  if (isConnected && !isCeloMainnet) {
     return (
       <main className="min-h-screen p-4 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Switch to Celo Sepolia</h2>
+          <h2 className="text-2xl font-bold mb-4">Switch to Celo Mainnet</h2>
           <p className="text-gray-600 mb-6">
-            Please switch to Celo Sepolia Testnet to use Enerpay
+            Please switch to Celo Mainnet to use Enerpay
           </p>
           <button
-            onClick={switchToCeloSepolia}
+            onClick={switchToCeloMainnet}
             className="w-full bg-celo-green text-white py-3 px-6 rounded-xl font-semibold hover:bg-primary-600 transition-colors"
           >
             Switch Network

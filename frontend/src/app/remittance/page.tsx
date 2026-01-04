@@ -8,7 +8,7 @@ import { useRemittance, useCalculateFee } from "@/hooks/useRemittance";
 import { isValidAddress, isValidPhoneNumber, formatPhoneToE164, parseCUSD } from "@/lib/celo/utils";
 import { getAddress, formatUnits, maxUint256, encodeFunctionData } from "viem";
 import { erc20Abi } from "viem";
-import { TOKENS, CELO_SEPOLIA_CHAIN_ID, CONTRACTS } from "@/lib/celo/constants";
+import { TOKENS, CELO_MAINNET_CHAIN_ID, CONTRACTS } from "@/lib/celo/constants";
 import { ENERPAY_REMITTANCE_ABI } from "@/lib/contracts/EnerpayRemittance.abi";
 import { Send, Loader2, Calculator } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -24,19 +24,19 @@ export default function RemittancePage() {
   // Log component mount
   useEffect(() => {
     console.log("🟢 RemittancePage component mounted");
-    console.log("📋 Contract address from constants:", CONTRACTS.ENERPAY_REMITTANCE_SEPOLIA);
+    console.log("📋 Contract address from constants:", CONTRACTS.ENERPAY_REMITTANCE_MAINNET);
   }, []);
 
   const { address, isConnected } = useAccount();
-  const { isCeloSepolia, contractAddress } = useRemittance();
+  const { isCeloMainnet, contractAddress } = useRemittance();
   
   // Log contract address from hook
   useEffect(() => {
     console.log("🔍 Contract address from hook:", contractAddress);
-    console.log("🔍 Is Celo Sepolia:", isCeloSepolia);
+    console.log("🔍 Is Celo Mainnet:", isCeloMainnet);
     console.log("🔍 Wallet connected:", isConnected);
     console.log("🔍 Wallet address:", address);
-  }, [contractAddress, isCeloSepolia, isConnected, address]);
+  }, [contractAddress, isCeloMainnet, isConnected, address]);
 
   const [beneficiary, setBeneficiary] = useState("");
   const [amount, setAmount] = useState("");
@@ -56,7 +56,7 @@ export default function RemittancePage() {
   const { writeContract: writeApprove, data: approveHash, isPending: isApproving } = useWriteContract();
   const { isLoading: isApprovingConfirming, isSuccess: isApprovalSuccess } = useWaitForTransactionReceipt({
     hash: approveHash,
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
     query: {
       enabled: !!approveHash && needsApproval,
     },
@@ -197,7 +197,7 @@ export default function RemittancePage() {
                 method: "eth_chainId",
               });
               
-              if (parseInt(currentChain as string, 16) !== CELO_SEPOLIA_CHAIN_ID) {
+              if (parseInt(currentChain as string, 16) !== CELO_MAINNET_CHAIN_ID) {
                 throw new Error(`Please switch to Celo Sepolia. Current chain: ${parseInt(currentChain as string, 16)}`);
               }
               
@@ -304,8 +304,8 @@ export default function RemittancePage() {
       return;
     }
 
-    if (!isCeloSepolia) {
-      setError("Please switch to Celo Sepolia network");
+    if (!isCeloMainnet) {
+      setError("Please switch to Celo Mainnet network");
       return;
     }
 
@@ -379,7 +379,7 @@ export default function RemittancePage() {
             abi: erc20Abi,
             functionName: "approve",
             args: [contractAddress, maxUint256], // Approve max for convenience
-            chainId: CELO_SEPOLIA_CHAIN_ID,
+            chainId: CELO_MAINNET_CHAIN_ID,
           });
           
           return; // Wait for approval to complete
@@ -670,12 +670,12 @@ export default function RemittancePage() {
     return (
       <div className="min-h-screen p-4 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Switch to Celo Sepolia</h2>
+          <h2 className="text-2xl font-bold mb-4">Switch to Celo Mainnet</h2>
           <p className="text-gray-600 mb-6">
-            Please switch to Celo Sepolia Testnet to use remittances
+            Please switch to Celo Mainnet to use remittances
           </p>
           <p className="text-sm text-gray-500 mb-4">
-            Chain ID: 11142220
+            Chain ID: 42220
           </p>
         </div>
       </div>

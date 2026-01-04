@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { CELO_SEPOLIA_CHAIN_ID, CONTRACTS } from "@/lib/celo/constants";
+import { CELO_MAINNET_CHAIN_ID, CONTRACTS } from "@/lib/celo/constants";
 import { MICROFINANCE_POOL_ABI } from "@/lib/contracts/MicrofinancePool.abi";
 import { parseUnits, formatUnits } from "viem";
 import { useMemo } from "react";
@@ -11,13 +11,14 @@ import { useMemo } from "react";
  */
 export function useMicrofinance() {
   const { chainId } = useAccount();
-  const isCeloSepolia = chainId === CELO_SEPOLIA_CHAIN_ID;
-  const contractAddress = CONTRACTS.MICROFINANCE_POOL_SEPOLIA;
+  const isCeloMainnet = chainId === CELO_MAINNET_CHAIN_ID;
+  // Use MAINNET contract address for production
+  const contractAddress = CONTRACTS.MICROFINANCE_POOL_MAINNET;
 
   return {
-    isCeloSepolia,
+    isCeloMainnet,
     contractAddress,
-    isReady: isCeloSepolia && !!contractAddress,
+    isReady: isCeloMainnet && !!contractAddress,
   };
 }
 
@@ -29,11 +30,11 @@ export function useReputationScore(address?: `0x${string}`) {
   const userAddress = address || accountAddress;
 
   const { data: reputation, isLoading } = useReadContract({
-    address: CONTRACTS.MICROFINANCE_POOL_SEPOLIA as `0x${string}`,
+    address: CONTRACTS.MICROFINANCE_POOL_MAINNET as `0x${string}`,
     abi: MICROFINANCE_POOL_ABI,
     functionName: "reputationScores",
     args: userAddress ? [userAddress] : undefined,
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
     query: {
       enabled: !!userAddress,
     },
@@ -53,11 +54,11 @@ export function useUserLoans(address?: `0x${string}`) {
   const userAddress = address || accountAddress;
 
   const { data: loanIds, isLoading } = useReadContract({
-    address: CONTRACTS.MICROFINANCE_POOL_SEPOLIA as `0x${string}`,
+    address: CONTRACTS.MICROFINANCE_POOL_MAINNET as `0x${string}`,
     abi: MICROFINANCE_POOL_ABI,
     functionName: "getUserLoans",
     args: userAddress ? [userAddress] : undefined,
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
     query: {
       enabled: !!userAddress,
     },
@@ -76,11 +77,11 @@ export function useLoan(loanId: bigint | number) {
   const loanIdBigInt = typeof loanId === "number" ? BigInt(loanId) : loanId;
 
   const { data: loan, isLoading } = useReadContract({
-    address: CONTRACTS.MICROFINANCE_POOL_SEPOLIA as `0x${string}`,
+    address: CONTRACTS.MICROFINANCE_POOL_MAINNET as `0x${string}`,
     abi: MICROFINANCE_POOL_ABI,
     functionName: "getLoan",
     args: [loanIdBigInt],
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
   });
 
   return {
@@ -96,11 +97,11 @@ export function useTotalOwed(loanId: bigint | number) {
   const loanIdBigInt = typeof loanId === "number" ? BigInt(loanId) : loanId;
 
   const { data: totalOwed, isLoading } = useReadContract({
-    address: CONTRACTS.MICROFINANCE_POOL_SEPOLIA as `0x${string}`,
+    address: CONTRACTS.MICROFINANCE_POOL_MAINNET as `0x${string}`,
     abi: MICROFINANCE_POOL_ABI,
     functionName: "calculateTotalOwed",
     args: [loanIdBigInt],
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
   });
 
   return {
@@ -117,7 +118,7 @@ export function useRequestLoan() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
   });
 
   const requestLoan = async (
@@ -128,11 +129,11 @@ export function useRequestLoan() {
     const amountWei = parseUnits(amount, 18);
 
     writeContract({
-      address: CONTRACTS.MICROFINANCE_POOL_SEPOLIA as `0x${string}`,
+      address: CONTRACTS.MICROFINANCE_POOL_MAINNET as `0x${string}`,
       abi: MICROFINANCE_POOL_ABI,
       functionName: "requestLoan",
       args: [amountWei, BigInt(duration), purpose],
-      chainId: CELO_SEPOLIA_CHAIN_ID,
+      chainId: CELO_MAINNET_CHAIN_ID,
     });
   };
 
@@ -151,10 +152,10 @@ export function useRequestLoan() {
  */
 export function usePoolBalance() {
   const { data: balance, isLoading } = useReadContract({
-    address: CONTRACTS.MICROFINANCE_POOL_SEPOLIA as `0x${string}`,
+    address: CONTRACTS.MICROFINANCE_POOL_MAINNET as `0x${string}`,
     abi: MICROFINANCE_POOL_ABI,
     functionName: "poolBalance",
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
   });
 
   return {
@@ -169,31 +170,31 @@ export function usePoolBalance() {
  */
 export function useMicrofinanceParams() {
   const { data: minLoanAmount, isLoading: loadingMin } = useReadContract({
-    address: CONTRACTS.MICROFINANCE_POOL_SEPOLIA as `0x${string}`,
+    address: CONTRACTS.MICROFINANCE_POOL_MAINNET as `0x${string}`,
     abi: MICROFINANCE_POOL_ABI,
     functionName: "minLoanAmount",
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
   });
 
   const { data: maxLoanAmount, isLoading: loadingMax } = useReadContract({
-    address: CONTRACTS.MICROFINANCE_POOL_SEPOLIA as `0x${string}`,
+    address: CONTRACTS.MICROFINANCE_POOL_MAINNET as `0x${string}`,
     abi: MICROFINANCE_POOL_ABI,
     functionName: "maxLoanAmount",
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
   });
 
   const { data: baseInterestRate, isLoading: loadingRate } = useReadContract({
-    address: CONTRACTS.MICROFINANCE_POOL_SEPOLIA as `0x${string}`,
+    address: CONTRACTS.MICROFINANCE_POOL_MAINNET as `0x${string}`,
     abi: MICROFINANCE_POOL_ABI,
     functionName: "baseInterestRate",
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
   });
 
   const { data: minReputationScore, isLoading: loadingRep } = useReadContract({
-    address: CONTRACTS.MICROFINANCE_POOL_SEPOLIA as `0x${string}`,
+    address: CONTRACTS.MICROFINANCE_POOL_MAINNET as `0x${string}`,
     abi: MICROFINANCE_POOL_ABI,
     functionName: "minReputationScore",
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
   });
 
   return {

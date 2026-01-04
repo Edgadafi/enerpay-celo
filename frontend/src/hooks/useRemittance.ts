@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { CONTRACTS, CELO_SEPOLIA_CHAIN_ID } from "@/lib/celo/constants";
+import { CONTRACTS, CELO_MAINNET_CHAIN_ID } from "@/lib/celo/constants";
 import { ENERPAY_REMITTANCE_ABI, RemittanceStatus } from "@/lib/contracts/EnerpayRemittance.abi";
 import { parseCUSD, formatCUSD } from "@/lib/celo/utils";
 import { useChainId } from "wagmi";
@@ -13,17 +13,18 @@ import { getAddress } from "viem";
 export function useRemittance() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
-  const isCeloSepolia = chainId === CELO_SEPOLIA_CHAIN_ID;
+  const isCeloMainnet = chainId === CELO_MAINNET_CHAIN_ID;
 
   // Normalize contract address (remove whitespace, get checksummed version)
+  // Use MAINNET contract address for production
   const contractAddress = getAddress(
-    CONTRACTS.ENERPAY_REMITTANCE_SEPOLIA.trim()
+    CONTRACTS.ENERPAY_REMITTANCE_MAINNET.trim()
   ) as `0x${string}`;
 
   return {
     address,
     isConnected,
-    isCeloSepolia,
+    isCeloMainnet,
     contractAddress,
   };
 }
@@ -40,7 +41,7 @@ export function useRemittanceHistory() {
     abi: ENERPAY_REMITTANCE_ABI,
     functionName: "getRemittanceHistory",
     args: address ? [address] : undefined,
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
     query: {
       enabled: !!address,
     },
@@ -63,7 +64,7 @@ export function useRemittanceById(remittanceId: bigint | undefined) {
     abi: ENERPAY_REMITTANCE_ABI,
     functionName: "getRemittance",
     args: remittanceId !== undefined ? [remittanceId] : undefined,
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
     query: {
       enabled: remittanceId !== undefined,
     },
@@ -97,7 +98,7 @@ export function useCalculateFee(amount: string) {
     abi: ENERPAY_REMITTANCE_ABI,
     functionName: "calculateFee",
     args: amountWei > 0n ? [amountWei] : undefined,
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
     query: {
       enabled: amountWei > 0n,
     },
@@ -125,7 +126,7 @@ export function useSendRemittance() {
 
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
-    chainId: CELO_SEPOLIA_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
   });
 
   const sendRemittance = async (
@@ -158,7 +159,7 @@ export function useSendRemittance() {
         destinationType,
         destinationId,
       ],
-      chainId: CELO_SEPOLIA_CHAIN_ID,
+      chainId: CELO_MAINNET_CHAIN_ID,
     });
     
     writeContract({
@@ -171,7 +172,7 @@ export function useSendRemittance() {
         destinationType,
         destinationId,
       ],
-      chainId: CELO_SEPOLIA_CHAIN_ID,
+      chainId: CELO_MAINNET_CHAIN_ID,
     });
     
     console.log("✅ writeContract call initiated (check hook error state for any errors)");

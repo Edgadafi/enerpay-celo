@@ -9,9 +9,9 @@ export const CELO_SEPOLIA_CHAIN_ID = 11142220; // Celo Sepolia Testnet
 export const CELO_ALFAJORES_CHAIN_ID = 44787;
 
 // Token Addresses
-// Celo Sepolia Testnet - Official contract addresses
+// Celo Mainnet - Production contract addresses
 export const TOKENS = {
-  CUSD: "0xdE9e4C3ce781b4bA68120d6261cbad65ce0aB00b" as const, // Celo Sepolia - Official cUSD contract
+  CUSD: "0x765DE816845861e75A25fCA122bb6898B8B1282a" as const, // Celo Mainnet - Official cUSD contract
   CREAL: "0xe8537a3d056DA446677B9E2d2516b1ee149eE628" as const,
   CEUR: "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73" as const,
   CELO: "0x471EcE3750Da237f93B8E339c536989b8978a438" as const, // Native CELO token

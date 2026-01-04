@@ -18,17 +18,29 @@ export function useCelo() {
   });
 
   /**
-   * Check if connected to Celo Sepolia (testnet)
-   */
-  const isCeloSepolia = chainId === CELO_SEPOLIA_CHAIN_ID;
-  
-  /**
-   * Check if connected to Celo Mainnet
+   * Check if connected to Celo Mainnet (production)
    */
   const isCeloMainnet = chainId === CELO_MAINNET_CHAIN_ID;
+  
+  /**
+   * Check if connected to Celo Sepolia (testnet) - for reference
+   */
+  const isCeloSepolia = chainId === CELO_SEPOLIA_CHAIN_ID;
 
   /**
-   * Switch to Celo Sepolia (testnet)
+   * Switch to Celo Mainnet (production)
+   */
+  const switchToCeloMainnet = async () => {
+    try {
+      await switchChain({ chainId: CELO_MAINNET_CHAIN_ID });
+    } catch (error) {
+      console.error("Error switching to Celo Mainnet:", error);
+      throw error;
+    }
+  };
+
+  /**
+   * Switch to Celo Sepolia (testnet) - for development
    */
   const switchToCeloSepolia = async () => {
     try {
@@ -39,42 +51,32 @@ export function useCelo() {
     }
   };
 
-  /**
-   * Switch to Celo Mainnet
-   */
-  const switchToCelo = async () => {
-    try {
-      await switchChain({ chainId: CELO_MAINNET_CHAIN_ID });
-    } catch (error) {
-      console.error("Error switching to Celo:", error);
-      throw error;
-    }
-  };
-
-  // Get cUSD balance using hook (works on both Sepolia and Mainnet)
+  // Get cUSD balance using hook (Celo Mainnet for production)
   const { data: cusdBalance } = useReadContract({
     address: TOKENS.CUSD,
     abi: erc20Abi,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
-    chainId: isCeloSepolia ? CELO_SEPOLIA_CHAIN_ID : CELO_MAINNET_CHAIN_ID,
+    chainId: CELO_MAINNET_CHAIN_ID,
     query: {
-      enabled: !!address && (isCeloSepolia || isCeloMainnet),
+      enabled: !!address && isCeloMainnet,
     },
   });
 
   return {
     address,
     isConnected,
-    isCeloSepolia,
     isCeloMainnet,
+    isCeloSepolia,
     chainId,
     celoBalance: celoBalance?.value || 0n,
     celoBalanceFormatted: celoBalance?.formatted || "0",
     cusdBalance: (cusdBalance as bigint) || 0n,
     cusdBalanceFormatted: cusdBalance ? formatCUSD(cusdBalance as bigint) : "0",
+    switchToCeloMainnet,
     switchToCeloSepolia,
-    switchToCelo,
+    // Alias for backward compatibility
+    switchToCelo: switchToCeloMainnet,
   };
 }
 

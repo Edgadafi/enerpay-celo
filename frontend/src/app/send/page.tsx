@@ -28,7 +28,7 @@ function getCUSDAddress(chainId: number): `0x${string}` {
 export default function SendPage() {
   console.log("🟢 SendPage component rendered");
   
-  const { address, isConnected, isCeloSepolia, chainId } = useCelo();
+  const { address, isConnected, isCeloMainnet, chainId } = useCelo();
   const walletChainId = useChainId(); // Get chainId directly from wagmi
   const { chain } = useAccount(); // Get chain info from account
   const config = useConfig(); // Get wagmi config
@@ -51,7 +51,7 @@ export default function SendPage() {
     walletChainId,
     chainIdFromChain: chain?.id,
     currentChainId,
-    isCeloSepolia,
+    isCeloMainnet,
     configChains: config.chains.map(c => ({ id: c.id, name: c.name })),
   });
 
@@ -63,7 +63,7 @@ export default function SendPage() {
       chainId: chain?.id,
       currentChainId,
       cusdAddress,
-      isCeloSepolia,
+      isCeloMainnet,
     });
   }, [isConnected, walletChainId, chain?.id, currentChainId, cusdAddress, isCeloSepolia]);
 
@@ -241,7 +241,7 @@ export default function SendPage() {
     console.log("✅ Connected, checking chain...", {
       walletChainId,
       chainId: chain?.id,
-      isCeloSepolia,
+      isCeloMainnet,
     });
 
     // Check if user is on a supported Celo chain
@@ -518,7 +518,7 @@ export default function SendPage() {
         <div className="bg-white rounded-2xl p-6 shadow-sm space-y-6">
           {/* Chain Info */}
           <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded-xl text-sm">
-            Network: {isCeloSepolia ? "Celo Sepolia (Testnet)" : chainId === CELO_MAINNET_CHAIN_ID ? "Celo Mainnet" : `Chain ${chainId}`}
+            Network: {isCeloMainnet ? "Celo Mainnet" : `Chain ${chainId}`}
             <br />
             cUSD Address: {cusdAddress.slice(0, 6)}...{cusdAddress.slice(-4)}
           </div>

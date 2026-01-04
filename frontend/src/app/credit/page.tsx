@@ -23,8 +23,8 @@ interface CreditRequest {
 
 export default function CreditPage() {
   const { isConnected, address } = useAccount();
-  const { isCeloSepolia, switchToCeloSepolia } = useCelo();
-  const { isCeloSepolia: isMicrofinanceReady, contractAddress } = useMicrofinance();
+  const { isCeloMainnet, switchToCeloMainnet } = useCelo();
+  const { isCeloMainnet: isMicrofinanceReady, contractAddress } = useMicrofinance();
   const { reputation, isLoading: reputationLoading } = useReputationScore();
   const { minLoanAmount, maxLoanAmount, minReputationScore, isLoading: paramsLoading } = useMicrofinanceParams();
   const { requestLoan, hash, isPending, isConfirming, isSuccess, error: txError } = useRequestLoan();
@@ -41,7 +41,7 @@ export default function CreditPage() {
     setError("");
 
     // Validation
-    if (!isCeloSepolia) {
+    if (!isCeloMainnet) {
       setError("Please switch to Celo Sepolia network");
       return;
     }
@@ -121,7 +121,7 @@ export default function CreditPage() {
             Please switch to Celo Sepolia Testnet to use credit services
           </p>
           <button
-            onClick={switchToCeloSepolia}
+            onClick={switchToCeloMainnet}
             className="w-full bg-celo-green text-white py-3 px-6 rounded-xl font-semibold hover:bg-primary-600 transition-colors"
           >
             Switch Network
