@@ -343,12 +343,6 @@ export default function RemittancePage() {
               setIsConfirming(false);
             }
             return;
-          } else {
-            console.error("❌ Allowance still insufficient after approval");
-            setError("Approval completed but allowance is still insufficient. Please try again.");
-            setNeedsApproval(false);
-          }
-        }
       } catch (err) {
         console.error("❌ Error sending after approval:", err);
         setError(err instanceof Error ? err.message : "Failed to send after approval");
