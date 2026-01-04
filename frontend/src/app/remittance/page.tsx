@@ -182,19 +182,27 @@ export default function RemittancePage() {
         return;
       }
       
+      // Use manual confirmation as fallback
+      const approvalConfirmed = isApprovalSuccess || manualApprovalConfirmed;
+      
       // Wait for approval to be confirmed
       if (isApproving || isApprovingConfirming) {
         console.log("⏳ Still waiting for approval confirmation...", {
           isApproving,
           isApprovingConfirming,
           isApprovalSuccess,
+          manualApprovalConfirmed,
+          approvalConfirmed,
         });
         return;
       }
       
-      // Only proceed if approval was successful
-      if (!isApprovalSuccess) {
-        console.log("⏸️ Approval not yet successful, waiting...");
+      // Only proceed if approval was successful (check both sources)
+      if (!approvalConfirmed) {
+        console.log("⏸️ Approval not yet successful, waiting...", {
+          isApprovalSuccess,
+          manualApprovalConfirmed,
+        });
         return;
       }
       
@@ -348,8 +356,9 @@ export default function RemittancePage() {
       }
     };
     
-    // Only run if we're waiting for approval and have an approval hash
-    if (needsApproval && approveHash && !isApproving && !isApprovingConfirming && isApprovalSuccess) {
+    // Only run if we're waiting for approval and have an approval hash (check both confirmation sources)
+    const approvalConfirmed = isApprovalSuccess || manualApprovalConfirmed;
+    if (needsApproval && approveHash && !isApproving && !isApprovingConfirming && approvalConfirmed) {
       // Small delay to ensure everything is ready
       const timer = setTimeout(() => {
         sendAfterApproval();
