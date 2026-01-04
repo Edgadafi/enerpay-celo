@@ -666,7 +666,7 @@ export default function RemittancePage() {
     );
   }
 
-  if (!isCeloSepolia) {
+  if (!isCeloMainnet) {
     return (
       <div className="min-h-screen p-4 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-6 text-center">
