@@ -61,8 +61,6 @@ export function useCelo() {
     query: {
       enabled: !!address && isCeloMainnet && isConnected,
       refetchInterval: 5000, // Refetch every 5 seconds to keep balance updated
-      onError: (err) => console.error("❌ Error fetching cUSD balance:", err),
-      onSuccess: (data) => console.log("✅ cUSD balance fetched successfully:", data?.toString()),
     },
   });
 
@@ -78,6 +76,16 @@ export function useCelo() {
     cusdBalanceError,
     enabled: !!address && isCeloMainnet && isConnected,
   });
+  
+  // Log errors separately
+  if (cusdBalanceError) {
+    console.error("❌ Error fetching cUSD balance:", cusdBalanceError);
+  }
+  
+  // Log successful fetches
+  if (cusdBalance !== undefined && !isCUSDBalanceLoading) {
+    console.log("✅ cUSD balance fetched successfully:", cusdBalance.toString());
+  }
 
   return {
     address,
