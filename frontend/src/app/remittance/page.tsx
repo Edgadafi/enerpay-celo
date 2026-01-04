@@ -138,6 +138,15 @@ export default function RemittancePage() {
   const [contractBalance, setContractBalance] = useState<string | null>(null);
   const [verificationStatus, setVerificationStatus] = useState<"idle" | "checking" | "verified" | "failed">("idle");
 
+  // Clean up approval state when remittance is sent successfully
+  useEffect(() => {
+    if (isSuccess) {
+      console.log("✅ Remittance sent successfully, cleaning up approval state");
+      setNeedsApproval(false);
+      setManualApprovalConfirmed(false);
+    }
+  }, [isSuccess]);
+
   // Verify transaction and contract balance after success
   useEffect(() => {
     if (isSuccess && txHash && (destinationType === "mobile" || destinationType === "bank")) {
