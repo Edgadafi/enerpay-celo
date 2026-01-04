@@ -53,13 +53,26 @@ export default function RemittancePage() {
   const [needsApproval, setNeedsApproval] = useState(false);
   const [isCheckingAllowance, setIsCheckingAllowance] = useState(false);
   
-  const { writeContract: writeApprove, data: approveHash, isPending: isApproving } = useWriteContract();
-  const { isLoading: isApprovingConfirming, isSuccess: isApprovalSuccess } = useWaitForTransactionReceipt({
+  const { writeContract: writeApprove, data: approveHash, isPending: isApproving, error: approveError } = useWriteContract();
+  const { isLoading: isApprovingConfirming, isSuccess: isApprovalSuccess, error: approveConfirmError } = useWaitForTransactionReceipt({
     hash: approveHash,
     chainId: CELO_MAINNET_CHAIN_ID,
     query: {
-      enabled: !!approveHash && needsApproval,
+      enabled: !!approveHash,
+      retry: 3,
+      retryDelay: 2000,
     },
+  });
+
+  // Log approval state for debugging
+  console.log("🔐 Approval state:", {
+    approveHash,
+    needsApproval,
+    isApproving,
+    isApprovingConfirming,
+    isApprovalSuccess,
+    approveError,
+    approveConfirmError,
   });
   
   const [contractBalance, setContractBalance] = useState<string | null>(null);

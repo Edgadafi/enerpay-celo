@@ -52,7 +52,7 @@ export function useCelo() {
   };
 
   // Get cUSD balance using hook (Celo Mainnet for production)
-  const { data: cusdBalance } = useReadContract({
+  const { data: cusdBalance, isLoading: isCUSDBalanceLoading, error: cusdBalanceError } = useReadContract({
     address: TOKENS.CUSD,
     abi: erc20Abi,
     functionName: "balanceOf",
@@ -60,8 +60,21 @@ export function useCelo() {
     chainId: CELO_MAINNET_CHAIN_ID,
     query: {
       enabled: !!address && isCeloMainnet,
+      refetchInterval: 5000, // Refetch every 5 seconds to keep balance updated
     },
   });
+
+  // Log balance for debugging
+  if (address && isCeloMainnet) {
+    console.log("💰 Balance check:", {
+      address,
+      isCeloMainnet,
+      cusdBalance,
+      cusdBalanceError,
+      isCUSDBalanceLoading,
+      formatted: cusdBalance ? formatCUSD(cusdBalance as bigint) : "0",
+    });
+  }
 
   return {
     address,
@@ -71,7 +84,7 @@ export function useCelo() {
     chainId,
     celoBalance: celoBalance?.value || 0n,
     celoBalanceFormatted: celoBalance?.formatted || "0",
-    cusdBalance: (cusdBalance as bigint) || 0n,
+    cusdBalance: cusdBalance ? (cusdBalance as bigint) : 0n,
     cusdBalanceFormatted: cusdBalance ? formatCUSD(cusdBalance as bigint) : "0",
     switchToCeloMainnet,
     switchToCeloSepolia,
