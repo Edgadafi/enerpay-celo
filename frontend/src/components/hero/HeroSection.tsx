@@ -14,8 +14,10 @@ export function HeroSection() {
         </div>
 
         {/* Main Tagline */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-          ¡Envía, Paga, Crece!
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight drop-shadow-2xl">
+          <span className="bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
+            ¡Envía, Paga, Crece!
+          </span>
         </h1>
 
         {/* Description */}

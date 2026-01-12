@@ -55,29 +55,31 @@ export function Logo({
           className={cn(
             "relative rounded-full flex items-center justify-center",
             sizeClasses[size],
-            "bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600 shadow-lg",
+            "bg-gradient-to-br from-latamfi-green via-emerald-500 to-teal-600 shadow-lg",
             animated && "animate-logo-pulse",
             showGlow && "animate-logo-glow"
           )}
         >
-          {/* Optimized Lightning Bolt SVG */}
+          {/* LatamFi Logo - Stylized "L" with Growth Arrow */}
           <svg
             className={cn(
-              "text-white transform rotate-12",
+              "text-white",
               iconSizeClasses[size],
-              animated && "animate-lightning-shimmer"
+              animated && "animate-logo-shimmer"
             )}
             fill="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
           >
-            {/* Optimized path - cleaner lightning bolt */}
+            {/* Stylized "L" with upward arrow representing growth */}
             <path
-              d="M13 1.5L4.5 13.5h6.5l-0.8 7.2L18.5 8.5h-6.5l1-7z"
+              d="M7 3h6v12h4l-6 6-6-6h4V3z"
               fill="currentColor"
               stroke="none"
             />
+            {/* Small accent circle */}
+            <circle cx="18" cy="6" r="2" fill="currentColor" opacity="0.8" />
           </svg>
         </div>
       )}
