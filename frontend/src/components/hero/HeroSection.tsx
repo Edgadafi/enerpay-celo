@@ -14,8 +14,14 @@ export function HeroSection() {
         </div>
 
         {/* Main Tagline */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight drop-shadow-2xl">
-          <span className="bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+          <span 
+            className="bg-gradient-to-r from-white via-gray-50 to-white bg-clip-text text-transparent"
+            style={{
+              textShadow: '0 2px 20px rgba(0, 0, 0, 0.5), 0 4px 40px rgba(0, 0, 0, 0.3)',
+              filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))'
+            }}
+          >
             ¡Envía, Paga, Crece!
           </span>
         </h1>
