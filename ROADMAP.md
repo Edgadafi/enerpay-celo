@@ -1,4 +1,4 @@
-# 🛣️ Enerpay Development Roadmap
+# 🛣️ LatamFi Development Roadmap
 
 > **Timeline:** November 2024 - June 2026  
 > **Goal:** Launch mainnet-ready platform for financial inclusion in LATAM
@@ -223,7 +223,7 @@
 
 ## 📊 Buildathon Considerations
 
-### Celo Buildathon México 2025
+### Celo Buildathon 2026
 
 **Key Requirements:**
 - ✅ Repositorio público (GitHub)
@@ -231,16 +231,16 @@
 - ✅ Participación en Proof of Ship 10
 
 **Evaluation Criteria:**
-- ✅ Mejor impacto social → Enfoque en comunidades mexicanas
+- ✅ Mejor impacto social → Enfoque en comunidades latinoamericanas
 - ✅ Mejor uso de tecnología Celo → cUSD, Mento, Valora
 - ✅ Mejor UX/UI móvil → PWA-first, responsive
 - ✅ Mejor integración con pagos estables → cUSD/cREAL nativos
 - ✅ Mejores integraciones → Self, Mento, Good Dollar, Thirdweb
 
 **Timeline:**
-- **Inscripción:** Antes del 15 de noviembre
-- **Entrega:** 5 de diciembre 2025
-- **Anuncio ganadores:** 5 de diciembre 2025
+- **Pre-registro:** 18 Dic 2025 → 16 Ene 2026
+- **Buildathon:** 19 Ene → 27 Feb 2026
+- **Demo Day:** 6 Mar 2026
 
 ---
 
@@ -272,5 +272,5 @@
 
 ---
 
-**Built for Celo Buildathon México 2025** 🇲🇽
+**Built for Celo Buildathon 2026** 🌎
 

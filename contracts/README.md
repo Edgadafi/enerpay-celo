@@ -1,12 +1,14 @@
-# Enerpay Smart Contracts
+# LatamFi Smart Contracts
 
-Smart contracts para Enerpay en Celo blockchain.
+Smart contracts para LatamFi en Celo blockchain.
+
+**Nota:** Los contratos están desplegados en Mainnet con los nombres `EnerpayRemittance` y `MicrofinancePool`. Estos nombres se mantienen para compatibilidad, pero la documentación y comentarios han sido actualizados para reflejar el rebranding a LatamFi.
 
 ## 📋 Contratos
 
 ### EnerpayRemittance.sol
 
-Contrato principal para manejo de remesas usando cUSD.
+Contrato principal para manejo de remesas usando cUSD (LatamFi Remittances).
 
 **Características:**
 - Envío de remesas con fees de plataforma (1.5% por defecto)

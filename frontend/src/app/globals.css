@@ -131,3 +131,26 @@ html {
   animation: lightning-shimmer 2s ease-in-out infinite;
 }
 
+/* Hero Section Styles */
+.hero-background {
+  background: linear-gradient(135deg, #0A1628 0%, #1a2332 100%);
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(53, 208, 127, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(53, 208, 127, 0.1) 0%, transparent 50%);
+  position: relative;
+}
+
+.hero-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px),
+    repeating-linear-gradient(60deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px),
+    repeating-linear-gradient(120deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px);
+  pointer-events: none;
+}
+

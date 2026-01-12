@@ -8,9 +8,9 @@ export const dynamic = "force-dynamic";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Enerpay - Financial Inclusion for LATAM",
+  title: "LatamFi - Financial Inclusion for LATAM",
   description:
-    "Mobile payments, remittances, and microfinance on Celo blockchain",
+    "¡Envía, Paga, Crece! Remesas, Servicios, Crédito. Comisiones Ultra Bajos. Potenciado por Celo",
   manifest: "/manifest.json",
   themeColor: "#35D07F",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Enerpay",
+    title: "LatamFi",
   },
 };
 

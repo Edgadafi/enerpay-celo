@@ -1,12 +1,12 @@
-# 🏗️ Enerpay Technical Architecture
+# 🏗️ LatamFi Technical Architecture
 
-> Deep dive into the technical design and implementation of Enerpay
+> Deep dive into the technical design and implementation of LatamFi
 
 ---
 
 ## Overview
 
-Enerpay is built as a **mobile-first, decentralized financial platform** with three main layers:
+LatamFi is built as a **mobile-first, decentralized financial platform** with three main layers:
 
 1. **Frontend Layer** - Next.js PWA with wallet integration
 2. **Smart Contract Layer** - Solidity contracts on Celo

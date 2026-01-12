@@ -86,12 +86,12 @@ export function Logo({
       {showText && (
         <span
           className={cn(
-            "font-bold text-celo-dark whitespace-nowrap",
+            "font-bold text-celo-dark dark:text-white whitespace-nowrap",
             textSizeClasses[size],
             animated && "animate-logo-fade-in"
           )}
         >
-          EnerPay
+          LatamFi
         </span>
       )}
     </div>

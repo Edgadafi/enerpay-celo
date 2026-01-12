@@ -9,6 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        latamfi: {
+          dark: "#0A1628",
+          darkAlt: "#1a2332",
+          green: "#35D07F",
+          white: "#FFFFFF",
+          light: "#FBFFFE",
+        },
         celo: {
           green: "#35D07F",
           dark: "#0D2818",

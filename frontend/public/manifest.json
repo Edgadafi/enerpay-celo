@@ -1,7 +1,7 @@
 {
-  "name": "Enerpay - Financial Inclusion for LATAM",
-  "short_name": "Enerpay",
-  "description": "Mobile payments, remittances, and microfinance on Celo blockchain",
+  "name": "LatamFi - Financial Inclusion for LATAM",
+  "short_name": "LatamFi",
+  "description": "¡Envía, Paga, Crece! Remesas, Servicios, Crédito. Comisiones Ultra Bajos. Potenciado por Celo",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FBFFFE",

@@ -76,7 +76,7 @@ if (!isValidProjectId) {
 // For production, you MUST set a valid projectId in .env.local
 // PRODUCTION: Using Celo Mainnet for production deployment
 export const config = getDefaultConfig({
-  appName: process.env.NEXT_PUBLIC_APP_NAME || "Enerpay",
+  appName: process.env.NEXT_PUBLIC_APP_NAME || "LatamFi",
   projectId: isValidProjectId ? projectId : "00000000000000000000000000000000", // Required by getDefaultConfig
   chains: [celoMainnet], // Celo Mainnet for production
   ssr: true, // Enable SSR support

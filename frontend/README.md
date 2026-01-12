@@ -1,6 +1,6 @@
-# Enerpay Frontend
+# LatamFi Frontend
 
-Frontend de Enerpay construido con Next.js 14, TypeScript, TailwindCSS y Wagmi/Viem para integración con Celo blockchain.
+Frontend de LatamFi construido con Next.js 14, TypeScript, TailwindCSS y Wagmi/Viem para integración con Celo blockchain.
 
 ## 🚀 Stack Tecnológico
 
@@ -44,7 +44,7 @@ NEXT_PUBLIC_CUSD_ADDRESS=0x765DE816845861e75A25fCA122bb6898B8B1282a
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id_here
 
 # App Config
-NEXT_PUBLIC_APP_NAME=Enerpay
+NEXT_PUBLIC_APP_NAME=LatamFi
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 

@@ -1,8 +1,8 @@
-# 💚 Enerpay - Financial Inclusion Platform for LATAM
+# 💚 LatamFi - Financial Inclusion Platform for LATAM
 
-> **Empowering communities through mobile payments, remittances, and microfinance on Celo**
+> **¡Envía, Paga, Crece! Remesas, Servicios, Crédito. Comisiones Ultra Bajos. Potenciado por Celo**
 
-Enerpay is a decentralized financial platform built on Celo, designed to bring financial services to underserved communities in Latin America. Through a lightweight mobile wallet, instant payments, simplified remittances, and community-based microfinance, Enerpay enables financial inclusion for millions.
+LatamFi is a decentralized financial platform built on Celo, designed to bring financial services to underserved communities in Latin America. Through a lightweight mobile wallet, instant payments, simplified remittances, and community-based microfinance, LatamFi enables financial inclusion for millions.
 
 ---
 
@@ -10,7 +10,7 @@ Enerpay is a decentralized financial platform built on Celo, designed to bring f
 
 **Financial inclusion for everyone, everywhere.**
 
-Enerpay leverages Celo's mobile-first blockchain and stablecoins to provide:
+LatamFi leverages Celo's mobile-first blockchain and stablecoins to provide:
 - 💳 **Instant Payments** - Send and receive money instantly using cUSD/cREAL
 - 🌍 **Simplified Remittances** - Low-cost cross-border transfers
 - 💰 **Microfinance** - Access to credit based on on-chain reputation
@@ -125,8 +125,8 @@ Enerpay leverages Celo's mobile-first blockchain and stablecoins to provide:
 
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/enerpay.git
-cd enerpay
+git clone https://github.com/YOUR_USERNAME/latamfi.git
+cd latamfi
 
 # Install dependencies
 cd frontend
@@ -160,7 +160,7 @@ npx hardhat run scripts/deploy.js --network alfajores
 
 ### 1. Daily Payments
 **Scenario:** Maria pays for groceries at a local store
-- Opens Enerpay wallet
+- Opens LatamFi wallet
 - Scans merchant QR code
 - Sends 50 cUSD
 - Transaction confirmed in <3 seconds
@@ -264,19 +264,24 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 ## 📞 Contact & Links
 
-- **GitHub**: [github.com/YOUR_USERNAME/enerpay](https://github.com/YOUR_USERNAME/enerpay)
+- **GitHub**: [github.com/YOUR_USERNAME/latamfi](https://github.com/YOUR_USERNAME/latamfi)
 - **Demo**: [Coming soon]
-- **Documentation**: [docs.enerpay.io](https://docs.enerpay.io) (coming soon)
+- **Documentation**: [docs.latamfi.io](https://docs.latamfi.io) (coming soon)
 
 ---
 
-## 🎯 Built for Celo Buildathon México 2025
+## 🎯 Built for Celo Buildathon 2026
 
-**Project:** Enerpay  
+**Project:** LatamFi  
 **Team:** Edgadafi  
 **Category:** Payments & Finance / Impact & Sustainability  
 **Blockchain:** Celo  
-**Status:** In Development
+**Status:** Beta - In Development
+
+**Timeline:**
+- **Pre-registro:** 18 Dic 2025 → 16 Ene 2026
+- **Buildathon:** 19 Ene → 27 Feb 2026
+- **Demo Day:** 6 Mar 2026
 
 ---
 

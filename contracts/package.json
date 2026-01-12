@@ -1,7 +1,7 @@
 {
-  "name": "enerpay-contracts",
+  "name": "latamfi-contracts",
   "version": "1.0.0",
-  "description": "Smart contracts for Enerpay on Celo",
+  "description": "Smart contracts for LatamFi on Celo",
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
