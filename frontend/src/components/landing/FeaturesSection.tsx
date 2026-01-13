@@ -36,7 +36,7 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="py-20 px-6 bg-[#0A1628] relative overflow-hidden">
+    <section id="features" className="py-20 px-6 bg-[#0A1628] relative overflow-hidden">
       {/* Hexagonal Pattern Overlay - Very subtle */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
            style={{ 

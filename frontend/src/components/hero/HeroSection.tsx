@@ -147,6 +147,12 @@ export function HeroSection() {
           </ConnectButton.Custom>
           
           <button 
+            onClick={() => {
+              const featuresSection = document.getElementById('features');
+              if (featuresSection) {
+                featuresSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
             className="px-8 py-4 border border-gray-600 text-white font-semibold rounded-xl hover:bg-white/5 transition-all"
             style={{
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
