@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Web3Provider } from "@/lib/wagmi/provider";
 
 export const dynamic = "force-dynamic";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-plus-jakarta-sans",
+  weight: ["400", "500", "600", "700", "800"],
+});
 
 export const metadata: Metadata = {
   title: "LatamFi - Financial Inclusion for LATAM",
@@ -33,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={inter.variable}>
+    <html lang="es" className={plusJakartaSans.variable}>
       <body className="antialiased bg-celo-light min-h-screen">
         <Web3Provider>{children}</Web3Provider>
       </body>

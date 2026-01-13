@@ -32,3 +32,4 @@ Write-Host "`nAhora puedes abrir Cursor nuevamente" -ForegroundColor Cyan
 
 
 
+

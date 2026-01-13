@@ -5,38 +5,45 @@ import { Logo } from "@/components/Logo";
 
 export function HeroSection() {
   return (
-    <div className="hero-background min-h-[90vh] flex flex-col items-center justify-center px-4 py-20 relative overflow-hidden">
-      {/* Content Container */}
-      <div className="relative z-10 max-w-2xl mx-auto text-center space-y-8">
-        {/* Logo */}
-        <div className="flex justify-center mb-8">
-          <Logo size="xl" variant="full" animated={true} showGlow={true} />
-        </div>
+    <section className="relative min-h-screen flex flex-col items-center justify-center bg-[#0A1628] overflow-hidden px-4">
+      {/* Background Glow Effect - Radial glow in cyan and Celo green */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#35D07F] opacity-10 blur-[120px] rounded-full" />
+      
+      {/* Hexagonal Pattern Overlay - Very subtle */}
+      <div className="absolute inset-0 opacity-[0.05] pointer-events-none" 
+           style={{ 
+             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
+           }} />
 
-        {/* Main Tagline */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-          <span 
-            className="bg-gradient-to-r from-white via-gray-50 to-white bg-clip-text text-transparent"
-            style={{
-              textShadow: '0 2px 20px rgba(0, 0, 0, 0.5), 0 4px 40px rgba(0, 0, 0, 0.3)',
-              filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))'
-            }}
-          >
-            ¡Envía, Paga, Crece!
-          </span>
+      {/* Badge - Powered by Celo */}
+      <div className="z-10 mb-6 flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#35D07F]/30 bg-[#35D07F]/10 backdrop-blur-sm">
+        <span className="w-2 h-2 rounded-full bg-[#35D07F] animate-pulse" />
+        <span className="text-[#35D07F] text-sm font-medium tracking-wide uppercase">
+          Potenciado por Celo
+        </span>
+      </div>
+
+      {/* Main Content */}
+      <div className="z-10 text-center max-w-4xl">
+        {/* Main Tagline - Clear and visible, no blur */}
+        <h1 
+          className="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight"
+          style={{
+            filter: 'drop-shadow(0 0 15px rgba(53, 208, 127, 0.3))',
+            textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          ¡Envía, Paga, <span className="text-[#35D07F]">Crece!</span>
         </h1>
-
+        
         {/* Description */}
-        <p className="text-lg md:text-xl text-gray-200 leading-relaxed max-w-xl mx-auto">
-          Remesas, Servicios, Crédito.
-          <br />
-          <span className="text-latamfi-green font-semibold">
-            Comisiones Ultra Bajos.
-          </span>
+        <p className="text-xl md:text-2xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+          Remesas, Servicios, Crédito. <br />
+          <span className="font-semibold text-white">Comisiones Ultra Bajas.</span>
         </p>
 
-        {/* CTA Button */}
-        <div className="pt-4">
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
           <ConnectButton.Custom>
             {({
               account,
@@ -72,7 +79,10 @@ export function HeroSection() {
                         <button
                           onClick={openConnectModal}
                           type="button"
-                          className="bg-latamfi-green hover:bg-primary-600 text-white font-semibold py-4 px-8 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 text-lg"
+                          className="px-8 py-4 bg-[#35D07F] text-[#0A1628] font-bold rounded-xl hover:scale-105 transition-all shadow-[0_0_20px_rgba(53,208,127,0.4)]"
+                          style={{
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                          }}
                         >
                           Conectar Wallet
                         </button>
@@ -84,7 +94,7 @@ export function HeroSection() {
                         <button
                           onClick={openChainModal}
                           type="button"
-                          className="bg-red-500 hover:bg-red-600 text-white font-semibold py-4 px-8 rounded-xl shadow-lg transition-all duration-200"
+                          className="px-8 py-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-all"
                         >
                           Red no soportada
                         </button>
@@ -96,17 +106,17 @@ export function HeroSection() {
                         <button
                           onClick={openChainModal}
                           type="button"
-                          className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"
+                          className="px-8 py-4 border border-gray-600 text-white font-semibold rounded-xl hover:bg-white/5 transition-all"
                         >
                           {chain.hasIcon && (
                             <div
+                              className="inline-block mr-2"
                               style={{
                                 background: chain.iconBackground,
                                 width: 20,
                                 height: 20,
                                 borderRadius: 999,
                                 overflow: "hidden",
-                                marginRight: 4,
                               }}
                             >
                               {chain.iconUrl && (
@@ -124,7 +134,7 @@ export function HeroSection() {
                         <button
                           onClick={openAccountModal}
                           type="button"
-                          className="bg-latamfi-green hover:bg-primary-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-200"
+                          className="px-8 py-4 bg-[#35D07F] text-[#0A1628] font-bold rounded-xl hover:scale-105 transition-all shadow-[0_0_20px_rgba(53,208,127,0.4)]"
                         >
                           {account.displayName}
                         </button>
@@ -135,16 +145,17 @@ export function HeroSection() {
               );
             }}
           </ConnectButton.Custom>
-        </div>
-
-        {/* Powered by Celo Badge */}
-        <div className="pt-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-            <span className="text-sm text-gray-300">Potenciado por</span>
-            <span className="text-latamfi-green font-bold text-sm">Celo</span>
-          </div>
+          
+          <button 
+            className="px-8 py-4 border border-gray-600 text-white font-semibold rounded-xl hover:bg-white/5 transition-all"
+            style={{
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          >
+            Ver Beneficios
+          </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

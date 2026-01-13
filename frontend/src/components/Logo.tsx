@@ -49,37 +49,46 @@ export function Logo({
         className
       )}
     >
-      {/* Logo Circle with Gradient */}
+      {/* Logo Icon - New Design from Gemini */}
       {showIcon && (
         <div
           className={cn(
-            "relative rounded-full flex items-center justify-center",
+            "relative flex items-center justify-center",
             sizeClasses[size],
-            "bg-gradient-to-br from-latamfi-green via-emerald-500 to-teal-600 shadow-lg",
             animated && "animate-logo-pulse",
             showGlow && "animate-logo-glow"
           )}
         >
-          {/* LatamFi Logo - Stylized "L" with Growth Arrow */}
+          {/* LatamFi Logo - "L" with Growth Arrow (Gemini Design) */}
           <svg
             className={cn(
-              "text-white",
-              iconSizeClasses[size],
+              "w-full h-full",
               animated && "animate-logo-shimmer"
             )}
-            fill="currentColor"
-            viewBox="0 0 24 24"
+            viewBox="0 0 40 40"
+            fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
+            preserveAspectRatio="xMidYMid meet"
           >
-            {/* Stylized "L" with upward arrow representing growth */}
+            {/* Background rectangle with rounded corners */}
+            <rect width="40" height="40" rx="8" fill="#35D07F" fillOpacity="0.1" />
+            {/* "L" shape */}
+            <path d="M12 28V12H16V24H28V28H12Z" fill="#35D07F" />
+            {/* Upward arrow */}
             <path
-              d="M7 3h6v12h4l-6 6-6-6h4V3z"
-              fill="currentColor"
-              stroke="none"
+              d="M20 20L24 16L28 20"
+              stroke="#35D07F"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-            {/* Small accent circle */}
-            <circle cx="18" cy="6" r="2" fill="currentColor" opacity="0.8" />
+            <path
+              d="M24 16V26"
+              stroke="#35D07F"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
           </svg>
         </div>
       )}
