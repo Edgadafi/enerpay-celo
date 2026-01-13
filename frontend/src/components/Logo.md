@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Logo component is a flexible, animated logo component for EnerPay with multiple variants and customization options.
+The Logo component is a flexible, animated logo component for LatamFi with multiple variants and customization options.
 
 ## Usage
 
@@ -44,14 +44,14 @@ Shows both icon and text (default).
 ```
 
 ### Icon Only
-Shows only the lightning bolt icon.
+Shows only the "L" with growth arrow icon.
 
 ```tsx
 <Logo variant="iconOnly" />
 ```
 
 ### Text Only
-Shows only "EnerPay" text.
+Shows only "LatamFi" text.
 
 ```tsx
 <Logo variant="textOnly" />
@@ -84,7 +84,7 @@ When `animated={true}`, the logo includes:
 
 1. **Fade In**: Smooth entrance animation
 2. **Pulse**: Subtle pulsing effect on the icon circle
-3. **Shimmer**: Gentle brightness animation on the lightning bolt
+3. **Shimmer**: Gentle brightness animation on the logo icon
 4. **Glow**: Optional glow effect around the icon (requires `showGlow={true}`)
 
 ### Animation Details
