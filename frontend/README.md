@@ -33,20 +33,63 @@ npm run dev
 Crea un archivo `.env.local` con las siguientes variables:
 
 ```env
-# Celo Network
+# ============================================
+# Celo Network Configuration
+# ============================================
+# Chain ID for Celo Mainnet (production)
 NEXT_PUBLIC_CELO_CHAIN_ID=42220
+# RPC URL for Celo Mainnet
 NEXT_PUBLIC_CELO_RPC_URL=https://forno.celo.org
 
-# cUSD Token Address
+# ============================================
+# Token Addresses (Celo Mainnet)
+# ============================================
+# cUSD (Celo Dollar) - Mainnet address
 NEXT_PUBLIC_CUSD_ADDRESS=0x765DE816845861e75A25fCA122bb6898B8B1282a
+# cEUR (Celo Euro) - Optional
+# NEXT_PUBLIC_CEUR_ADDRESS=0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73
+# cREAL (Celo Real) - Optional
+# NEXT_PUBLIC_CREAL_ADDRESS=0xe8537a3d056DA446677B9E2d2516b1ee149eE628
 
+# ============================================
+# WalletConnect Configuration
+# ============================================
 # WalletConnect Project ID (obtén uno en https://cloud.walletconnect.com)
+# REQUIRED: Sin esto, la conexión de wallet no funcionará
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id_here
 
-# App Config
+# ============================================
+# Application Configuration
+# ============================================
+# Application name (used in metadata, manifest, etc.)
 NEXT_PUBLIC_APP_NAME=LatamFi
+# Application URL (used for Open Graph, canonical URLs, etc.)
+# Development: http://localhost:3000
+# Production: https://your-domain.com
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# ============================================
+# Optional: Analytics & Monitoring
+# ============================================
+# Google Analytics ID (optional)
+# NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+# Sentry DSN (optional, for error tracking)
+# NEXT_PUBLIC_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
 ```
+
+#### Variables Requeridas vs Opcionales
+
+**Requeridas:**
+- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` - Necesario para conexión de wallets
+- `NEXT_PUBLIC_CELO_CHAIN_ID` - ID de la red Celo
+- `NEXT_PUBLIC_CELO_RPC_URL` - URL del RPC de Celo
+- `NEXT_PUBLIC_CUSD_ADDRESS` - Dirección del contrato cUSD
+
+**Opcionales:**
+- `NEXT_PUBLIC_APP_NAME` - Por defecto: "LatamFi"
+- `NEXT_PUBLIC_APP_URL` - Por defecto: "http://localhost:3000"
+- `NEXT_PUBLIC_CEUR_ADDRESS` - Solo si usas cEUR
+- `NEXT_PUBLIC_CREAL_ADDRESS` - Solo si usas cREAL
 
 ### WalletConnect Project ID
 

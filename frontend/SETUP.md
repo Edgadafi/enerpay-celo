@@ -1,4 +1,4 @@
-# 🚀 Guía Rápida de Setup - Enerpay Frontend
+# 🚀 Guía Rápida de Setup - LatamFi Frontend
 
 ## ⚡ Inicio Rápido (5 minutos)
 

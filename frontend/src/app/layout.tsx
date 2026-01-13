@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Web3Provider } from "@/lib/wagmi/provider";
+import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
+import { FeedbackButton } from "@/components/feedback/FeedbackButton";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +31,63 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "LatamFi",
   },
+  // Open Graph / Facebook
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+    title: "LatamFi - Financial Inclusion for LATAM",
+    description:
+      "¡Envía, Paga, Crece! Remesas, Servicios, Crédito. Comisiones Ultra Bajos. Potenciado por Celo",
+    siteName: "LatamFi",
+    images: [
+      {
+        url: "/og-image.png", // TODO: Add OG image
+        width: 1200,
+        height: 630,
+        alt: "LatamFi - Financial Inclusion for LATAM",
+      },
+    ],
+  },
+  // Twitter Card
+  twitter: {
+    card: "summary_large_image",
+    title: "LatamFi - Financial Inclusion for LATAM",
+    description:
+      "¡Envía, Paga, Crece! Remesas, Servicios, Crédito. Comisiones Ultra Bajos. Potenciado por Celo",
+    images: ["/og-image.png"], // TODO: Add Twitter image
+    creator: "@latamfi", // TODO: Add Twitter handle
+  },
+  // Additional metadata
+  keywords: [
+    "LatamFi",
+    "Celo",
+    "Remesas",
+    "Microcréditos",
+    "Blockchain",
+    "cUSD",
+    "Financial Inclusion",
+    "LATAM",
+    "Web3",
+    "DeFi",
+  ],
+  authors: [{ name: "LatamFi Team" }],
+  creator: "LatamFi",
+  publisher: "LatamFi",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  },
 };
 
 export default function RootLayout({
@@ -39,7 +98,12 @@ export default function RootLayout({
   return (
     <html lang="es" className={plusJakartaSans.variable}>
       <body className="antialiased bg-celo-light min-h-screen">
-        <Web3Provider>{children}</Web3Provider>
+        <Web3Provider>
+          <AnalyticsProvider>
+            {children}
+            <FeedbackButton />
+          </AnalyticsProvider>
+        </Web3Provider>
       </body>
     </html>
   );
