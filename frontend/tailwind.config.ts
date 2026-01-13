@@ -39,8 +39,17 @@ const config: Config = {
       },
       fontSize: {
         "tagline": ["3.5rem", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800" }],
-        "h2": ["2.25rem", { lineHeight: "1.2", fontWeight: "600" }],
+        "h1": ["3.5rem", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800" }],
+        "h2": ["2.5rem", { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "700" }],
         "body": ["1.125rem", { lineHeight: "1.75", fontWeight: "400" }],
+      },
+      screens: {
+        'xs': '475px',
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1536px',
       },
     },
   },
