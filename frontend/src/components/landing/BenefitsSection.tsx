@@ -1,72 +1,49 @@
 "use client";
 
-import { DollarSign, Clock, Lock, TrendingUp } from "lucide-react";
-
-const benefits = [
+// Stats strip para generar confianza
+const stats = [
   {
-    icon: DollarSign,
-    stat: "<1%",
-    label: "Comisiones Ultra Bajas",
-    description: "Paga menos que los servicios tradicionales de remesas",
+    value: "< 1s",
+    label: "Tiempo de transacción",
   },
   {
-    icon: Clock,
-    stat: "<3s",
-    label: "Transacciones Instantáneas",
-    description: "Confirmación en segundos, no días",
+    value: "$0.001",
+    label: "Comisión promedio",
   },
   {
-    icon: Lock,
-    stat: "100%",
-    label: "Seguro y Descentralizado",
-    description: "Tus fondos están protegidos por blockchain",
-  },
-  {
-    icon: TrendingUp,
-    stat: "24/7",
-    label: "Disponible Siempre",
-    description: "Accede a tus fondos en cualquier momento",
+    value: "100%",
+    label: "Non-custodial",
+    sublabel: "Tú controlas tus fondos",
   },
 ];
 
 export function BenefitsSection() {
   return (
-    <section className="py-20 px-4 hero-background text-white">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            ¿Por qué elegir LatamFi?
-          </h2>
-          <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-            La plataforma financiera más rápida, segura y económica para LATAM
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {benefits.map((benefit, index) => {
-            const Icon = benefit.icon;
-            return (
-              <div
-                key={index}
-                className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 text-center"
-              >
-                <div className="flex justify-center mb-4">
-                  <div className="p-3 bg-latamfi-green/20 rounded-xl">
-                    <Icon className="w-8 h-8 text-latamfi-green" />
-                  </div>
-                </div>
-                <div className="text-4xl font-bold text-latamfi-green mb-2">
-                  {benefit.stat}
-                </div>
-                <h3 className="text-xl font-semibold mb-2">
-                  {benefit.label}
-                </h3>
-                <p className="text-gray-300 text-sm">
-                  {benefit.description}
+    <section className="py-24 px-6 bg-[#0A1628] relative overflow-hidden">
+      {/* Hexagonal Pattern Overlay - Very subtle */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+           style={{ 
+             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
+           }} />
+      
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Stats Strip */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-10 border-t border-white/5">
+          {stats.map((stat, index) => (
+            <div key={index} className="text-center">
+              <p className="text-[#35D07F] text-3xl md:text-4xl font-bold mb-2">
+                {stat.value}
+              </p>
+              <p className="text-gray-400 text-xs uppercase tracking-widest mb-1">
+                {stat.label}
+              </p>
+              {stat.sublabel && (
+                <p className="text-gray-500 text-xs">
+                  {stat.sublabel}
                 </p>
-              </div>
-            );
-          })}
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </section>

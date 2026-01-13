@@ -1,37 +1,36 @@
 "use client";
 
-import { Send, ArrowDownUp, CreditCard, Zap, Shield, Globe } from "lucide-react";
-
+// Features con SVG paths directos para mejor rendimiento
 const features = [
   {
-    icon: Send,
     title: "Remesas Instantáneas",
-    description: "Envía dinero a cualquier parte de Latinoamérica en segundos, sin intermediarios bancarios.",
+    description: "Transferencias transfronterizas en segundos usando cUSD.",
+    iconPath: "M12 8v8m4-4H8",
   },
   {
-    icon: ArrowDownUp,
-    title: "Pagos de Servicios",
-    description: "Paga servicios públicos, facturas y más directamente desde tu wallet.",
-  },
-  {
-    icon: CreditCard,
     title: "Microcréditos",
-    description: "Accede a crédito basado en tu reputación on-chain, sin burocracia tradicional.",
+    description: "Acceso a financiamiento basado en reputación on-chain.",
+    iconPath: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6",
   },
   {
-    icon: Zap,
-    title: "Transacciones Rápidas",
-    description: "Confirmación en menos de 3 segundos en Celo Mainnet, sin esperas.",
+    title: "Pago de Servicios",
+    description: "Paga luz, agua y telefonía directamente desde la app.",
+    iconPath: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z",
   },
   {
-    icon: Shield,
-    title: "Seguro y Descentralizado",
-    description: "Tus fondos están protegidos por smart contracts auditados y verificados.",
+    title: "Comisiones Bajas",
+    description: "Menos de $0.01 por transacción gracias a la red Celo.",
+    iconPath: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
   },
   {
-    icon: Globe,
-    title: "Potenciado por Celo",
-    description: "Construido sobre la blockchain más amigable para móviles y usuarios.",
+    title: "Multi-Asset",
+    description: "Soporte para Celo, cUSD, cEUR y otros activos locales.",
+    iconPath: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10",
+  },
+  {
+    title: "Inclusión Total",
+    description: "Diseñado para funcionar incluso con conexiones de baja velocidad.",
+    iconPath: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
   },
 ];
 
@@ -47,39 +46,36 @@ export function FeaturesSection() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16 px-4">
-          <h2 
-            className="text-2xl md:text-3xl lg:text-h2 font-bold mb-4 bg-gradient-to-r from-white via-white to-[#35D07F]/50 bg-clip-text text-transparent"
-            style={{
-              filter: 'drop-shadow(0 0 15px rgba(53, 208, 127, 0.3))',
-            }}
-          >
-            Todo lo que necesitas para tu economía digital
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Todo lo que necesitas en un solo lugar
           </h2>
-          <p className="text-base md:text-body text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            LatamFi te ofrece las herramientas financieras que necesitas, todo en un solo lugar
-          </p>
         </div>
 
         {/* Features Grid - Responsive: 1 col mobile, 2 col tablet, 3 col desktop */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
           {features.map((feature, index) => {
-            const Icon = feature.icon;
             return (
               <div
                 key={index}
-                className="p-6 md:p-8 rounded-2xl bg-[#1a2332]/40 backdrop-blur-lg border border-white/10 hover:border-[#35D07F]/50 transition-all group hover:shadow-[0_0_30px_rgba(53,208,127,0.2)] hover:-translate-y-1"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(26, 35, 50, 0.4) 0%, rgba(26, 35, 50, 0.3) 100%)',
-                  borderImage: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(53,208,127,0.2) 100%) 1',
-                }}
+                className="p-6 rounded-xl border border-white/5 bg-[#1a2332] hover:bg-[#1f2937] transition-colors group"
               >
                 {/* Icon Container */}
-                <div className="w-12 h-12 rounded-lg bg-[#35D07F]/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#35D07F]/20 transition-all duration-300">
-                  <Icon className="w-6 h-6 text-[#35D07F]" />
+                <div className="w-10 h-10 bg-[#35D07F]/20 rounded-lg flex items-center justify-center mb-4 group-hover:bg-[#35D07F]/30 transition-colors">
+                  <svg 
+                    className="w-6 h-6 text-[#35D07F]" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d={feature.iconPath} />
+                  </svg>
                 </div>
                 
                 {/* Title */}
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#35D07F] transition-colors">
+                <h3 className="text-xl font-semibold text-white mb-2">
                   {feature.title}
                 </h3>
                 
